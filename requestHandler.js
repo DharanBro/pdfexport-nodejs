@@ -51,7 +51,7 @@ var exportpdf = function(files,reply){
     pdfContent.setTextColor(100);
     pdfContent.text(20, 20, 'Hello world!');
     pdfContent.addPage();
-    pdfContent.addImage(imgData, 'JPEG',  40, 20, 0, 0);
+    pdfContent.addImage(imgData, 'PNG',  40, 20, 0, 0);
 
                     
     let data = pdfContent.output('arraybuffer');
