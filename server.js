@@ -57,6 +57,20 @@ server.register(require("inert"),(err)=>{
     });
 
     server.route({
+        method: 'POST',
+        path:'/table2pdf', 
+        handler: requestHandler.table2pdf
+    
+    });
+
+    server.route({
+        method: 'GET',
+        path:'/canvg', 
+        handler: requestHandler.canvg
+    
+    });
+
+    server.route({
         method: 'GET',
         path:'/index', 
         handler: requestHandler.index
