@@ -1,3 +1,10 @@
+var jsdom = require("jsdom").jsdom;
+global.Element = function(){};
+global.Sizzle = function(){};
+var DOMParser = require('xmldom').DOMParser;
+var path = require('path');
+
+
 /*
  * canvg.js - Javascript SVG parser and renderer on Canvas
  * MIT Licensed
@@ -17,7 +24,7 @@
 
 	// ...or as browserify
 	else if (typeof module !== 'undefined' && module.exports) {
-		module.exports = factory(require('rgbcolor'), require('stackblur'));
+		module.exports = factory(require('./libs/rgbcolor'), require('./libs/stackblur'));
 	}
 
 	global.canvg = factory(global.RGBColor, global.stackBlur);
@@ -263,6 +270,7 @@
 				xmlDoc.loadXml(xml, settings);
 				return xmlDoc;
 			} else if (window.DOMParser) {
+				console.log(path.basename(__filename),"Into window.DOMParser");
 				var parser = new DOMParser();
 				return parser.parseFromString(xml, 'text/xml');
 			} else {

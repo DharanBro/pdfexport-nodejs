@@ -71,6 +71,19 @@ server.register(require("inert"),(err)=>{
     });
 
     server.route({
+        method: 'POST',
+        path:'/canvgserver', 
+        handler: requestHandler.canvgserver
+    
+    });
+
+    server.route({
+        method: 'POST',
+        path:'/finalPdf', 
+        handler: requestHandler.finalPdf
+    
+    });
+    server.route({
         method: 'GET',
         path:'/index', 
         handler: requestHandler.index
