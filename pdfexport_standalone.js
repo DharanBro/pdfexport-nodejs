@@ -302,10 +302,10 @@ var _exportTabletoPdf = function(rowsArray, component, pdf, startPosY, exportOpt
 }
 
 var finalPdf = function(){
-
+    var filename=process.argv[2];
     var fs = require('fs');
     var obj;
-    fs.readFile('input', 'utf8', function (err, filedata) {
+    fs.readFile(filename, 'utf8', function (err, filedata) {
         if (err) throw err;
 
 
