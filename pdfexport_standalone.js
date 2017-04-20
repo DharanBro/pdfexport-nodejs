@@ -1366,6 +1366,7 @@ var finalPdf = function(){
                 console.log(err);
             } else {
                 console.log("PDF created");
+                process.exit(0);
             }
         });
 
@@ -1594,3 +1595,4 @@ var getStartPosition = function(pdf_prop, isFooter, alignment, content, fontSize
 }
 
 finalPdf();
+
