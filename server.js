@@ -89,6 +89,12 @@ server.register(require("inert"),(err)=>{
         handler: requestHandler.index
     });
 
+    server.route({
+        method: 'GET',
+        path:'/phantomtest', 
+        handler: requestHandler.phantomtest
+    });
+
 });
 
 

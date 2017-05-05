@@ -308,7 +308,7 @@ var finalPdf = function(){
     fs.readFile(filename, 'utf8', function (err, filedata) {
         if (err) throw err;
 
-
+        
         //let pdfData=request.payload.pdfData;
         let pdfData=JSON.parse(Buffer.from(filedata, 'base64'));
         //let pdfData=JSON.parse(filedata);
@@ -319,7 +319,7 @@ var finalPdf = function(){
         let footer_content=pdfData.footer;
         let pdf_prop=pdfData.pdf_prop;
 
-        //console.log(pdfData.header);
+        console.log(pdfData.header);
 
         "use strict"
         var jsdom = require("jsdom").jsdom;
@@ -375,8 +375,7 @@ var finalPdf = function(){
                             
                     let svgData=pdfContent[eachPage].data;
                     console.log(startPosY+50);
-                    
-                                
+                         
 
                     //load a svg snippet in the canvas with id = 'drawingArea'
                     canvg(c, svgData, {
@@ -390,7 +389,7 @@ var finalPdf = function(){
                     startPosY=addHeaderFooter(pdfDoc, pageNumber.toString(),pdf_prop,header_content,footer_content);
                     break;
                 case 'table':
-                    let crosstabstring = [
+                    let crosstabstring1 = [
                         {
                         "TABLE_1_control":[
                             7,
@@ -1336,6 +1335,9 @@ var finalPdf = function(){
                         ]
                         }
                     ];
+
+                    let crosstabstring=JSON.parse(pdfContent[eachPage].data);
+                    console.log(crosstabstring);
                     
                     let exportOptions = {};
                     let crosstabs=crosstabstring[0];
@@ -1378,7 +1380,7 @@ var finalPdf = function(){
 var addHeaderFooter = function(doc, pageNo, pdf_prop, header_content, footer_content){
     let imageWidth=201;
     let imageHeight=72;
-    let retY;
+    let retY=0;
 
     /***********************************************
     Header Generation
