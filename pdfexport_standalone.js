@@ -1372,7 +1372,7 @@ var finalPdf = function(){
 
         let buffer = Buffer.from(data);
         let arraybuffer = Uint8Array.from(buffer);
-        fs.appendFile('./'+filename+'.pdf', new Buffer(arraybuffer), function (err) {
+        fs.appendFile('./export/'+filename+'.pdf', new Buffer(arraybuffer), function (err) {
             if (err) {
                 console.log(err);
             } else {
