@@ -320,7 +320,7 @@ var finalPdf = function(){
 
         console.log(pdfData.header);
 
-        "use strict"
+        'use strict'
         //var jsdom = require("jsdom").jsdom;
         // global.document = jsdom(undefined, {});
         const jsdom = require("jsdom");
@@ -1368,7 +1368,7 @@ var finalPdf = function(){
 
         let data = pdfDoc.output('arraybuffer');
 
-        fs.writeFileSync('./output.txt', pdfDoc.output());
+        //fs.writeFileSync('./output.txt', pdfDoc.output());
 
         let buffer = Buffer.from(data);
         let arraybuffer = Uint8Array.from(buffer);
@@ -1379,7 +1379,7 @@ var finalPdf = function(){
                 console.log("PDF created");
                 process.exit(0);
             }
-        });filename
+        });
 
         // reply("Process finished");
     });
