@@ -1,5 +1,4 @@
-var fs = require('fs'),
-    multiparty = require('multiparty');
+var fs = require('fs');
 
 var pageDimensions = {
     'p': {
@@ -310,8 +309,8 @@ var finalPdf = function(){
 
         
         //let pdfData=request.payload.pdfData;
-        let pdfData=JSON.parse(Buffer.from(filedata, 'base64'));
-        //let pdfData=JSON.parse(filedata);
+        //let pdfData=JSON.parse(Buffer.from(filedata, 'base64'));
+        let pdfData=JSON.parse(filedata);
         //let pdfData=require('./jsonData').pdf_data; 
         let pdfContent=pdfData.content;
 
@@ -322,15 +321,22 @@ var finalPdf = function(){
         console.log(pdfData.header);
 
         "use strict"
-        var jsdom = require("jsdom").jsdom;
-        global.document = jsdom(undefined, {});
-        global.window = document.defaultView;
-        global.navigator = window.navigator;
+        //var jsdom = require("jsdom").jsdom;
+        // global.document = jsdom(undefined, {});
+        const jsdom = require("jsdom");
+        const { JSDOM } = jsdom;
+        const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
 
-        global.btoa = () => {};
+        global.document = dom.window.document;
+        
+        global.window = dom.window;
+        global.navigator = window.navigator;
+        
+        
     
         let fs = require('fs');
         let jsPDF = require('jspdf');
+        let svgToPdf = require('./plugins/svgToPdf');
         let Cell= require('./plugins/jspdf-plugin');
         let base64Img = require('base64-img');
         let canvg = require("./libs/canvg_context2d/canvg");
@@ -377,13 +383,16 @@ var finalPdf = function(){
                     console.log(startPosY+50);
                          
 
-                    //load a svg snippet in the canvas with id = 'drawingArea'
+                    //load a svg snippet in the canvas 
                     canvg(c, svgData, {
                         ignoreMouse: true,
                         ignoreAnimation: true,
                         ignoreDimensions: true
                     });
-
+                    // svgToPdf.svgElementToPdf(svgData, pdfDoc, {
+                    //     scale: 72/96, // this is the ratio of px to pt units
+                    //     removeInvalid: true // this removes elements that could not be translated to pdf from the source svg
+                    // });
                     pdfDoc.addPage();
                     pageNumber++;
                     startPosY=addHeaderFooter(pdfDoc, pageNumber.toString(),pdf_prop,header_content,footer_content);
@@ -1363,14 +1372,14 @@ var finalPdf = function(){
 
         let buffer = Buffer.from(data);
         let arraybuffer = Uint8Array.from(buffer);
-        fs.appendFile('./final.pdf', new Buffer(arraybuffer), function (err) {
+        fs.appendFile('./'+filename+'.pdf', new Buffer(arraybuffer), function (err) {
             if (err) {
                 console.log(err);
             } else {
                 console.log("PDF created");
                 process.exit(0);
             }
-        });
+        });filename
 
         // reply("Process finished");
     });
