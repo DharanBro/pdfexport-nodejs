@@ -7,7 +7,7 @@ class Emitter extends EventEmitter {}
 const emitter = new Emitter();
 
 emitter.on('error', (err) => {
-    logger.error('Unexpected error on emitter', err);
+    console.log('Unexpected error on emitter', err);
     process.exit(1);
 });
 
