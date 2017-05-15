@@ -1,5 +1,16 @@
 var fs = require('fs');
 
+const EventEmitter = require('events');
+
+class Emitter extends EventEmitter {}
+
+const emitter = new Emitter();
+
+emitter.on('error', (err) => {
+    logger.error('Unexpected error on emitter', err);
+    process.exit(1);
+});
+
 var pageDimensions = {
     'p': {
     'a2': {
@@ -305,1083 +316,134 @@ var finalPdf = function(){
     var fs = require('fs');
     var obj;
     fs.readFile(filename, 'utf8', function (err, filedata) {
-        if (err) throw err;
 
-        
-        //let pdfData=request.payload.pdfData;
-        //let pdfData=JSON.parse(Buffer.from(filedata, 'base64'));
-        let pdfData=JSON.parse(filedata);
-        //let pdfData=require('./jsonData').pdf_data; 
-        let pdfContent=pdfData.content;
-
-        let header_content=pdfData.header;
-        let footer_content=pdfData.footer;
-        let pdf_prop=pdfData.pdf_prop;
-
-        console.log(pdfData.header);
-
-        'use strict'
-        //var jsdom = require("jsdom").jsdom;
-        // global.document = jsdom(undefined, {});
-        const jsdom = require("jsdom");
-        const { JSDOM } = jsdom;
-        const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
-
-        global.document = dom.window.document;
-        
-        global.window = dom.window;
-        global.navigator = window.navigator;
-        
-        
-    
-        let fs = require('fs');
-        let jsPDF = require('jspdf');
-        let svgToPdf = require('./plugins/svgToPdf');
-        let Cell= require('./plugins/jspdf-plugin');
-        let base64Img = require('base64-img');
-        let canvg = require("./libs/canvg_context2d/canvg");
-        
-        let pdfDoc = new jsPDF(pdf_prop.orientation, 'pt', pdf_prop.format);
-
-        
-
-        let pageNumber=1;
-        let startPosY;
-        let svgCount=0;
-
-        startPosY=addHeaderFooter(pdfDoc, pageNumber.toString(),pdf_prop,header_content,footer_content);
-        var c = pdfDoc.canvas;
-        c.width = 595;
-        c.height = 500;
-
-        var ctx = c.getContext('2d');
-
-        ctx.ignoreClearRect = true;
-        ctx.translate(0,startPosY+50);
-
-        
-        
-        
-        for(var eachPage in pdfContent){
-            
-            //console.log(eachPage+": "+pdfContent[eachPage].type);
-            switch(pdfContent[eachPage].type){
-                case 'image':
-                    
-                    let imgData=pdfContent[eachPage].data;
-                    //console.log(startPosY+50);
-                    pdfDoc.addImage(imgData, 'PNG',  40, startPosY+50, 0, 0);
-
-                    pdfDoc.addPage();
-                    pageNumber++;
-                    startPosY=addHeaderFooter(pdfDoc, pageNumber.toString(),pdf_prop,header_content,footer_content);
-                    
-                    break;
-                case 'svg':
-                            
-                    let svgData=pdfContent[eachPage].data;
-                    console.log(startPosY+50);
-                         
-
-                    //load a svg snippet in the canvas 
-                    canvg(c, svgData, {
-                        ignoreMouse: true,
-                        ignoreAnimation: true,
-                        ignoreDimensions: true
-                    });
-                    // svgToPdf.svgElementToPdf(svgData, pdfDoc, {
-                    //     scale: 72/96, // this is the ratio of px to pt units
-                    //     removeInvalid: true // this removes elements that could not be translated to pdf from the source svg
-                    // });
-                    pdfDoc.addPage();
-                    pageNumber++;
-                    startPosY=addHeaderFooter(pdfDoc, pageNumber.toString(),pdf_prop,header_content,footer_content);
-                    break;
-                case 'table':
-                    let crosstabstring1 = [
-                        {
-                        "TABLE_1_control":[
-                            7,
-                            1,
-                            [
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"Number of Records",
-                                    "align":"left",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"205",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"3,075",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"410",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"205",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"820",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"5,740",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"1,435",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"1,025",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"1,845",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"14,760",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                }
-                            ],
-                            [
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"Consumption (Billion",
-                                    "align":"left",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"47",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"700",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"76",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"3",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"373",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"3,003",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"510",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"3,109",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"273",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"8,095",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                }
-                            ],
-                            [
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"Consumption (Billion",
-                                    "align":"left",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"490",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"7,248",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"783",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"39",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"3,855",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"31,073",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"5,282",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"32,153",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"2,853",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"83,775",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                }
-                            ],
-                            [
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"Consumption (Million",
-                                    "align":"left",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"0",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"0",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"0",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"0",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"0",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"0",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"0",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"0",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"0",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"0",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                }
-                            ],
-                            [
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"Consumption (Million",
-                                    "align":"left",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"2,437",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"36,398",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"2,388",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"778",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"4,882",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"72,747",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"12,371",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"73,407",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"10,614",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"216,022",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                }
-                            ],
-                            [
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"Consumption (Thousan",
-                                    "align":"left",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"41,847",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"631,405",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"36,579",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"15,608",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"29,605",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"924,754",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"159,005",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"971,538",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"173,604",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#F6F6F6",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"2,983,944",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                }
-                            ],
-                            [
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"Consumption (Terawat",
-                                    "align":"left",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"1,882",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"16,715",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"1,637",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"60",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"610",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"28,554",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"477",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"25,293",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"13,280",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                },
-                                {
-                                    "symbol":"",
-                                    "color":"#FFFFFF",
-                                    "colSpanPos":"N",
-                                    "rowSpanPos":"N",
-                                    "text":"88,508",
-                                    "align":"right",
-                                    "isSpan":"false",
-                                    "fontColor":"#000000",
-                                    "isBold":"false",
-                                    "alertLvl":"0"
-                                }
-                            ]
-                        ]
-                        }
-                    ];
-
-                    let crosstabstring=JSON.parse(pdfContent[eachPage].data);
-                    console.log(crosstabstring);
-                    
-                    let exportOptions = {};
-                    let crosstabs=crosstabstring[0];
-                    
-                    let pagesAcross=_exportTabletoPdf(crosstabs["TABLE_1_control"], "TABLE_1_control", pdfDoc, startPosY, exportOptions, pageNumber,pageDimensions,pdf_prop,header_content,footer_content);
-                    pageNumber+=pagesAcross;
-                    
-                    pdfDoc.addPage();
-                    startPosY=addHeaderFooter(pdfDoc, pageNumber.toString(),pdf_prop,header_content,footer_content);
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        //console.log("Pagenumber",pageNumber);
-
-        pdfDoc.deletePage(pageNumber);
-
-        let data = pdfDoc.output('arraybuffer');
-
-        //fs.writeFileSync('./output.txt', pdfDoc.output());
-
-        let buffer = Buffer.from(data);
-        let arraybuffer = Uint8Array.from(buffer);
-        fs.appendFile('./export/'+filename+'.pdf', new Buffer(arraybuffer), function (err) {
+        try {
             if (err) {
-                console.log(err);
-            } else {
-                console.log("PDF created");
-                process.exit(0);
+                emitter.emit('error', err);
             }
-        });
 
-        // reply("Process finished");
+            let pdfData=JSON.parse(filedata);
+            
+            let pdfContent=pdfData.content;
+
+            let header_content=pdfData.header;
+            let footer_content=pdfData.footer;
+            let pdf_prop=pdfData.pdf_prop;
+
+            'use strict'
+            
+            const jsdom = require("jsdom");
+            const { JSDOM } = jsdom;
+            const dom = new JSDOM(`<!DOCTYPE html><p></p>`);
+
+            global.document = dom.window.document;
+            
+            global.window = dom.window;
+            global.navigator = window.navigator;
+            
+            
+        
+            let fs = require('fs');
+            let jsPDF = require('jspdf');
+            let svgToPdf = require('./plugins/svgToPdf');
+            let Cell= require('./plugins/jspdf-plugin');
+            let base64Img = require('base64-img');
+            let canvg = require("./libs/canvg_context2d/canvg");
+            
+            let pdfDoc = new jsPDF(pdf_prop.orientation, 'pt', pdf_prop.format);
+
+            
+
+            let pageNumber=1;
+            let startPosY;
+            let svgCount=0;
+
+            startPosY=addHeaderFooter(pdfDoc, pageNumber.toString(),pdf_prop,header_content,footer_content);
+            var c = pdfDoc.canvas;
+            c.width = 595;
+            c.height = 500;
+
+            var ctx = c.getContext('2d');
+
+            ctx.ignoreClearRect = true;
+            ctx.translate(0,startPosY+50);
+
+            
+            
+            
+            for(var eachPage in pdfContent){
+                
+                
+                switch(pdfContent[eachPage].type){
+                    case 'image':
+                        
+                        let imgData=pdfContent[eachPage].data;
+                        pdfDoc.addImage(imgData, 'PNG',  40, startPosY+50, 0, 0);
+
+                        pdfDoc.addPage();
+                        pageNumber++;
+                        startPosY=addHeaderFooter(pdfDoc, pageNumber.toString(),pdf_prop,header_content,footer_content);
+                        
+                        break;
+                    case 'svg':
+                                
+                        let svgData=pdfContent[eachPage].data;
+                        //console.log(startPosY+50);
+                            
+
+                        canvg(c, svgData, {
+                            ignoreMouse: true,
+                            ignoreAnimation: true,
+                            ignoreDimensions: true
+                        });
+                        
+                        pdfDoc.addPage();
+                        pageNumber++;
+                        startPosY=addHeaderFooter(pdfDoc, pageNumber.toString(),pdf_prop,header_content,footer_content);
+                        break;
+                    case 'table':
+                        
+                        let crosstabstring=JSON.parse(pdfContent[eachPage].data);
+                        //console.log(crosstabstring);
+                        
+                        let exportOptions = {};
+                        let crosstabs=crosstabstring[0];
+                        
+                        let pagesAcross=_exportTabletoPdf(crosstabs["TABLE_1_control"], "TABLE_1_control", pdfDoc, startPosY, exportOptions, pageNumber,pageDimensions,pdf_prop,header_content,footer_content);
+                        pageNumber+=pagesAcross;
+                        
+                        pdfDoc.addPage();
+                        startPosY=addHeaderFooter(pdfDoc, pageNumber.toString(),pdf_prop,header_content,footer_content);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            pdfDoc.deletePage(pageNumber);
+
+            let data = pdfDoc.output('arraybuffer');
+
+
+            let buffer = Buffer.from(data);
+            let arraybuffer = Uint8Array.from(buffer);
+            fs.appendFile(filename+'.pdf', new Buffer(arraybuffer), function (err) {
+                if (err) {
+                    console.log(err);
+                    process.exit(1);
+                } else {
+                    console.log("PDF created");
+                    process.exit(0);
+                }
+            });
+
+            // reply("Process finished");
+            
+        } catch(err) {
+            emitter.emit('error', err);
+        }
+        
+        
     });
     
 } 
@@ -1404,9 +466,7 @@ var addHeaderFooter = function(doc, pageNo, pdf_prop, header_content, footer_con
             header_content.image_align, 
             imageWidth, 
             imageHeight);
-            //console.log(pdf_prop.top_margin);
         imagePosObj.y=0+parseInt(pdf_prop.top_margin);
-        //console.log("########################################",imagePosObj.y);
         doc.addImage(header_content.image, 'PNG',  imagePosObj.x, imagePosObj.y, 0, 0);
         
         retY = imagePosObj.y;
@@ -1544,7 +604,6 @@ var addHeaderFooter = function(doc, pageNo, pdf_prop, header_content, footer_con
         }else if(footer_content.image_align===footer_content.page_no_align){
             footerImgPosObj.y=footerPagePosObj-imageHeight-5;
         }
-        //console.log("Footer image y position",footerImgPosObj.y);
         doc.addImage(header_content.image, 'PNG',  footerImgPosObj.x, footerImgPosObj.y, 0, 0);
         
     }
@@ -1606,4 +665,3 @@ var getStartPosition = function(pdf_prop, isFooter, alignment, content, fontSize
 }
 
 finalPdf();
-

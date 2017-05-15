@@ -270,7 +270,6 @@ var path = require('path');
 				xmlDoc.loadXml(xml, settings);
 				return xmlDoc;
 			} else if (window.DOMParser) {
-				console.log(path.basename(__filename),"Into window.DOMParser");
 				var parser = new DOMParser();
 				return parser.parseFromString(xml, 'text/xml');
 			} else {
