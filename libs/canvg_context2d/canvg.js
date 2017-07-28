@@ -1,6 +1,8 @@
-var jsdom = require("jsdom").jsdom;
-global.Element = function(){};
-global.Sizzle = function(){};
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
+const dom1 = new JSDOM();
+global.Element = dom1.window.Element;
+global.Sizzle = require("sizzle");
 var DOMParser = require('xmldom').DOMParser;
 var path = require('path');
 
@@ -13,7 +15,7 @@ var path = require('path');
  *
  * Requires: rgbcolor.js - http://www.phpied.com/rgb-color-parser-in-javascript/
  */
-(function(global, factory) {
+(function (global, factory) {
 
 	'use strict';
 
@@ -29,7 +31,7 @@ var path = require('path');
 
 	global.canvg = factory(global.RGBColor, global.stackBlur);
 
-}(typeof window !== 'undefined' ? window : this, function(RGBColor, stackBlur) {
+}(typeof window !== 'undefined' ? window : this, function (RGBColor, stackBlur) {
 
 	// canvg(target, s)
 	// empty parameters: replace all 'svg' elements on page with 'canvas' elements
@@ -46,7 +48,7 @@ var path = require('path');
 	//		 scaleHeight: int => scales vertically to height
 	//		 renderCallback: function => will call the function after the first render is completed
 	//		 forceRedraw: function => will call the function on every frame, if it returns true, will redraw
-	var canvg = function(target, s, opts) {
+	var canvg = function (target, s, opts) {
 		// no parameters
 		if (target == null && s == null && opts == null) {
 			var svgTags = document.querySelectorAll('svg');
@@ -93,23 +95,23 @@ var path = require('path');
 	// see https://developer.mozilla.org/en-US/docs/Web/API/Element.matches
 	var matchesSelector;
 	if (typeof Element.prototype.matches != 'undefined') {
-		matchesSelector = function(node, selector) {
+		matchesSelector = function (node, selector) {
 			return node.matches(selector);
 		};
 	} else if (typeof Element.prototype.webkitMatchesSelector != 'undefined') {
-		matchesSelector = function(node, selector) {
+		matchesSelector = function (node, selector) {
 			return node.webkitMatchesSelector(selector);
 		};
 	} else if (typeof Element.prototype.mozMatchesSelector != 'undefined') {
-		matchesSelector = function(node, selector) {
+		matchesSelector = function (node, selector) {
 			return node.mozMatchesSelector(selector);
 		};
 	} else if (typeof Element.prototype.msMatchesSelector != 'undefined') {
-		matchesSelector = function(node, selector) {
+		matchesSelector = function (node, selector) {
 			return node.msMatchesSelector(selector);
 		};
 	} else if (typeof Element.prototype.oMatchesSelector != 'undefined') {
-		matchesSelector = function(node, selector) {
+		matchesSelector = function (node, selector) {
 			return node.oMatchesSelector(selector);
 		};
 	} else {
@@ -119,7 +121,7 @@ var path = require('path');
 		// without it, this is a ReferenceError
 
 		if (typeof jQuery === 'function' || typeof Zepto === 'function') {
-			matchesSelector = function(node, selector) {
+			matchesSelector = function (node, selector) {
 				return $(node).is(selector);
 			};
 		}
@@ -141,7 +143,7 @@ var path = require('path');
 
 	function getSelectorSpecificity(selector) {
 		var typeCount = [0, 0, 0];
-		var findMatch = function(regex, type) {
+		var findMatch = function (regex, type) {
 			var matches = selector.match(regex);
 			if (matches == null) {
 				return;
@@ -172,17 +174,17 @@ var path = require('path');
 		svg.FRAMERATE = 30;
 		svg.MAX_VIRTUAL_PIXELS = 30000;
 
-		svg.log = function(msg) {};
+		svg.log = function (msg) { };
 		if (svg.opts['log'] == true && typeof console != 'undefined') {
-			svg.log = function(msg) {
+			svg.log = function (msg) {
 				console.log(msg);
 			};
 		};
 
 		// globals
-		svg.init = function(ctx) {
+		svg.init = function (ctx) {
 			var uniqueId = 0;
-			svg.UniqueId = function() {
+			svg.UniqueId = function () {
 				uniqueId++;
 				return 'canvg' + uniqueId;
 			};
@@ -192,30 +194,30 @@ var path = require('path');
 			svg.Animations = [];
 			svg.Images = [];
 			svg.ctx = ctx;
-			svg.ViewPort = new(function() {
+			svg.ViewPort = new (function () {
 				this.viewPorts = [];
-				this.Clear = function() {
+				this.Clear = function () {
 					this.viewPorts = [];
 				}
-				this.SetCurrent = function(width, height) {
+				this.SetCurrent = function (width, height) {
 					this.viewPorts.push({
 						width: width,
 						height: height
 					});
 				}
-				this.RemoveCurrent = function() {
+				this.RemoveCurrent = function () {
 					this.viewPorts.pop();
 				}
-				this.Current = function() {
+				this.Current = function () {
 					return this.viewPorts[this.viewPorts.length - 1];
 				}
-				this.width = function() {
+				this.width = function () {
 					return this.Current().width;
 				}
-				this.height = function() {
+				this.height = function () {
 					return this.Current().height;
 				}
-				this.ComputeSize = function(d) {
+				this.ComputeSize = function (d) {
 					if (d != null && typeof d == 'number') return d;
 					if (d == 'x') return this.width();
 					if (d == 'y') return this.height();
@@ -227,7 +229,7 @@ var path = require('path');
 		svg.init();
 
 		// images loaded
-		svg.ImagesLoaded = function() {
+		svg.ImagesLoaded = function () {
 			for (var i = 0; i < svg.Images.length; i++) {
 				if (!svg.Images[i].loaded) return false;
 			}
@@ -235,17 +237,17 @@ var path = require('path');
 		}
 
 		// trim
-		svg.trim = function(s) {
+		svg.trim = function (s) {
 			return s.replace(/^\s+|\s+$/g, '');
 		}
 
 		// compress spaces
-		svg.compressSpaces = function(s) {
+		svg.compressSpaces = function (s) {
 			return s.replace(/[\s\r\t\n]+/gm, ' ');
 		}
 
 		// ajax
-		svg.ajax = function(url) {
+		svg.ajax = function (url) {
 			var AJAX;
 			if (window.XMLHttpRequest) {
 				AJAX = new XMLHttpRequest();
@@ -261,7 +263,7 @@ var path = require('path');
 		}
 
 		// parse xml
-		svg.parseXml = function(xml) {
+		svg.parseXml = function (xml) {
 			if (typeof Windows != 'undefined' && typeof Windows.Data != 'undefined' &&
 				typeof Windows.Data.Xml != 'undefined') {
 				var xmlDoc = new Windows.Data.Xml.Dom.XmlDocument();
@@ -281,20 +283,20 @@ var path = require('path');
 			}
 		}
 
-		svg.Property = function(name, value) {
+		svg.Property = function (name, value) {
 			this.name = name;
 			this.value = value;
 		}
-		svg.Property.prototype.getValue = function() {
+		svg.Property.prototype.getValue = function () {
 			return this.value;
 		}
 
-		svg.Property.prototype.hasValue = function() {
+		svg.Property.prototype.hasValue = function () {
 			return (this.value != null && this.value !== '');
 		}
 
 		// return the numerical value of the property
-		svg.Property.prototype.numValue = function() {
+		svg.Property.prototype.numValue = function () {
 			if (!this.hasValue()) return 0;
 
 			var n = parseFloat(this.value);
@@ -304,19 +306,19 @@ var path = require('path');
 			return n;
 		}
 
-		svg.Property.prototype.valueOrDefault = function(def) {
+		svg.Property.prototype.valueOrDefault = function (def) {
 			if (this.hasValue()) return this.value;
 			return def;
 		}
 
-		svg.Property.prototype.numValueOrDefault = function(def) {
+		svg.Property.prototype.numValueOrDefault = function (def) {
 			if (this.hasValue()) return this.numValue();
 			return def;
 		}
 
 		// color extensions
 		// augment the current color value with the opacity
-		svg.Property.prototype.addOpacity = function(opacityProp) {
+		svg.Property.prototype.addOpacity = function (opacityProp) {
 			var newValue = this.value;
 
 			//ss handle undefined value string
@@ -333,7 +335,7 @@ var path = require('path');
 
 		// definition extensions
 		// get the definition from the definitions table
-		svg.Property.prototype.getDefinition = function() {
+		svg.Property.prototype.getDefinition = function () {
 			var name = this.value.match(/#([^\)'"]+)/);
 			if (name) {
 				name = name[1];
@@ -344,11 +346,11 @@ var path = require('path');
 			return svg.Definitions[name];
 		}
 
-		svg.Property.prototype.isUrlDefinition = function() {
+		svg.Property.prototype.isUrlDefinition = function () {
 			return this.value.indexOf('url(') == 0
 		}
 
-		svg.Property.prototype.getFillStyleDefinition = function(e, opacityProp) {
+		svg.Property.prototype.getFillStyleDefinition = function (e, opacityProp) {
 			var def = this.getDefinition();
 
 			// gradient
@@ -372,11 +374,11 @@ var path = require('path');
 		}
 
 		// length extensions
-		svg.Property.prototype.getDPI = function(viewPort) {
+		svg.Property.prototype.getDPI = function (viewPort) {
 			return 96.0; // TODO: compute?
 		}
 
-		svg.Property.prototype.getEM = function(viewPort) {
+		svg.Property.prototype.getEM = function (viewPort) {
 			var em = 12;
 
 			var fontSize = new svg.Property('fontSize', svg.Font.Parse(svg.ctx.font).fontSize);
@@ -385,13 +387,13 @@ var path = require('path');
 			return em;
 		}
 
-		svg.Property.prototype.getUnits = function() {
+		svg.Property.prototype.getUnits = function () {
 			var s = this.value + '';
 			return s.replace(/[0-9\.\-]/g, '');
 		}
 
 		// get the length as pixels
-		svg.Property.prototype.toPixels = function(viewPort, processPercent) {
+		svg.Property.prototype.toPixels = function (viewPort, processPercent) {
 			if (!this.hasValue()) return 0;
 			var s = this.value + '';
 			if (s.match(/em$/)) return this.numValue() * this.getEM(viewPort);
@@ -413,7 +415,7 @@ var path = require('path');
 
 		// time extensions
 		// get the time as milliseconds
-		svg.Property.prototype.toMilliseconds = function() {
+		svg.Property.prototype.toMilliseconds = function () {
 			if (!this.hasValue()) return 0;
 			var s = this.value + '';
 			if (s.match(/s$/)) return this.numValue() * 1000;
@@ -423,7 +425,7 @@ var path = require('path');
 
 		// angle extensions
 		// get the angle as radians
-		svg.Property.prototype.toRadians = function() {
+		svg.Property.prototype.toRadians = function () {
 			if (!this.hasValue()) return 0;
 			var s = this.value + '';
 			if (s.match(/deg$/)) return this.numValue() * (Math.PI / 180.0);
@@ -447,19 +449,19 @@ var path = require('path');
 			'hanging': 'hanging',
 			'mathematical': 'alphabetic'
 		};
-		svg.Property.prototype.toTextBaseline = function() {
+		svg.Property.prototype.toTextBaseline = function () {
 			if (!this.hasValue()) return null;
 			return textBaselineMapping[this.value];
 		}
 
 		// fonts
-		svg.Font = new(function() {
+		svg.Font = new (function () {
 			this.Styles = 'normal|italic|oblique|inherit';
 			this.Variants = 'normal|small-caps|inherit';
 			this.Weights =
 				'normal|bold|bolder|lighter|100|200|300|400|500|600|700|800|900|inherit';
 
-			this.CreateFont = function(fontStyle, fontVariant, fontWeight, fontSize,
+			this.CreateFont = function (fontStyle, fontVariant, fontWeight, fontSize,
 				fontFamily, inherit) {
 				var f = inherit != null ? this.Parse(inherit) : this.CreateFont('', '',
 					'', '', '', svg.ctx.font);
@@ -469,16 +471,16 @@ var path = require('path');
 					fontStyle: fontStyle || f.fontStyle,
 					fontWeight: fontWeight || f.fontWeight,
 					fontVariant: fontVariant || f.fontVariant,
-					toString: function() {
+					toString: function () {
 						return [this.fontStyle, this.fontVariant, this.fontWeight, this.fontSize,
-							this.fontFamily
+						this.fontFamily
 						].join(' ')
 					}
 				}
 			}
 
 			var that = this;
-			this.Parse = function(s) {
+			this.Parse = function (s) {
 				var f = {};
 				var d = svg.trim(svg.compressSpaces(s || '')).split(' ');
 				var set = {
@@ -512,7 +514,7 @@ var path = require('path');
 		});
 
 		// points and paths
-		svg.ToNumberArray = function(s) {
+		svg.ToNumberArray = function (s) {
 			var a = svg.trim(svg.compressSpaces((s || '').replace(/,/g, ' '))).split(
 				' ');
 			for (var i = 0; i < a.length; i++) {
@@ -520,26 +522,26 @@ var path = require('path');
 			}
 			return a;
 		}
-		svg.Point = function(x, y) {
+		svg.Point = function (x, y) {
 			this.x = x;
 			this.y = y;
 		}
-		svg.Point.prototype.angleTo = function(p) {
+		svg.Point.prototype.angleTo = function (p) {
 			return Math.atan2(p.y - this.y, p.x - this.x);
 		}
 
-		svg.Point.prototype.applyTransform = function(v) {
+		svg.Point.prototype.applyTransform = function (v) {
 			var xp = this.x * v[0] + this.y * v[2] + v[4];
 			var yp = this.x * v[1] + this.y * v[3] + v[5];
 			this.x = xp;
 			this.y = yp;
 		}
 
-		svg.CreatePoint = function(s) {
+		svg.CreatePoint = function (s) {
 			var a = svg.ToNumberArray(s);
 			return new svg.Point(a[0], a[1]);
 		}
-		svg.CreatePath = function(s) {
+		svg.CreatePath = function (s) {
 			var a = svg.ToNumberArray(s);
 			var path = [];
 			for (var i = 0; i < a.length; i += 2) {
@@ -549,26 +551,26 @@ var path = require('path');
 		}
 
 		// bounding box
-		svg.BoundingBox = function(x1, y1, x2, y2) { // pass in initial points if you want
+		svg.BoundingBox = function (x1, y1, x2, y2) { // pass in initial points if you want
 			this.x1 = Number.NaN;
 			this.y1 = Number.NaN;
 			this.x2 = Number.NaN;
 			this.y2 = Number.NaN;
 
-			this.x = function() {
+			this.x = function () {
 				return this.x1;
 			}
-			this.y = function() {
+			this.y = function () {
 				return this.y1;
 			}
-			this.width = function() {
+			this.width = function () {
 				return this.x2 - this.x1;
 			}
-			this.height = function() {
+			this.height = function () {
 				return this.y2 - this.y1;
 			}
 
-			this.addPoint = function(x, y) {
+			this.addPoint = function (x, y) {
 				if (x != null) {
 					if (isNaN(this.x1) || isNaN(this.x2)) {
 						this.x1 = x;
@@ -587,19 +589,19 @@ var path = require('path');
 					if (y > this.y2) this.y2 = y;
 				}
 			}
-			this.addX = function(x) {
+			this.addX = function (x) {
 				this.addPoint(x, null);
 			}
-			this.addY = function(y) {
+			this.addY = function (y) {
 				this.addPoint(null, y);
 			}
 
-			this.addBoundingBox = function(bb) {
+			this.addBoundingBox = function (bb) {
 				this.addPoint(bb.x1, bb.y1);
 				this.addPoint(bb.x2, bb.y2);
 			}
 
-			this.addQuadraticCurve = function(p0x, p0y, p1x, p1y, p2x, p2y) {
+			this.addQuadraticCurve = function (p0x, p0y, p1x, p1y, p2x, p2y) {
 				var cp1x = p0x + 2 / 3 * (p1x - p0x); // CP1 = QP0 + 2/3 *(QP1-QP0)
 				var cp1y = p0y + 2 / 3 * (p1y - p0y); // CP1 = QP0 + 2/3 *(QP1-QP0)
 				var cp2x = cp1x + 1 / 3 * (p2x - p0x); // CP2 = CP1 + 1/3 *(QP2-QP0)
@@ -607,7 +609,7 @@ var path = require('path');
 				this.addBezierCurve(p0x, p0y, cp1x, cp2x, cp1y, cp2y, p2x, p2y);
 			}
 
-			this.addBezierCurve = function(p0x, p0y, p1x, p1y, p2x, p2y, p3x, p3y) {
+			this.addBezierCurve = function (p0x, p0y, p1x, p1y, p2x, p2y, p3x, p3y) {
 				// from http://blog.hackers-cafe.net/2009/06/how-to-calculate-bezier-curves-bounding.html
 				var p0 = [p0x, p0y],
 					p1 = [p1x, p1y],
@@ -617,7 +619,7 @@ var path = require('path');
 				this.addPoint(p3[0], p3[1]);
 
 				for (i = 0; i <= 1; i++) {
-					var f = function(t) {
+					var f = function (t) {
 						return Math.pow(1 - t, 3) * p0[i] + 3 * Math.pow(1 - t, 2) * t * p1[
 							i] + 3 * (1 - t) * Math.pow(t, 2) * p2[i] + Math.pow(t, 3) * p3[i];
 					}
@@ -651,7 +653,7 @@ var path = require('path');
 				}
 			}
 
-			this.isPointInBox = function(x, y) {
+			this.isPointInBox = function (x, y) {
 				return (this.x1 <= x && x <= this.x2 && this.y1 <= y && y <= this.y2);
 			}
 
@@ -660,41 +662,41 @@ var path = require('path');
 		}
 
 		// transforms
-		svg.Transform = function(v) {
+		svg.Transform = function (v) {
 			var that = this;
 			this.Type = {}
 
 			// translate
-			this.Type.translate = function(s) {
+			this.Type.translate = function (s) {
 				this.p = svg.CreatePoint(s);
-				this.apply = function(ctx) {
+				this.apply = function (ctx) {
 					ctx.translate(this.p.x || 0.0, this.p.y || 0.0);
 				}
-				this.unapply = function(ctx) {
+				this.unapply = function (ctx) {
 					ctx.translate(-1.0 * this.p.x || 0.0, -1.0 * this.p.y || 0.0);
 				}
-				this.applyToPoint = function(p) {
+				this.applyToPoint = function (p) {
 					p.applyTransform([1, 0, 0, 1, this.p.x || 0.0, this.p.y || 0.0]);
 				}
 			}
 
 			// rotate
-			this.Type.rotate = function(s) {
+			this.Type.rotate = function (s) {
 				var a = svg.ToNumberArray(s);
 				this.angle = new svg.Property('angle', a[0]);
 				this.cx = a[1] || 0;
 				this.cy = a[2] || 0;
-				this.apply = function(ctx) {
+				this.apply = function (ctx) {
 					ctx.translate(this.cx, this.cy);
 					ctx.rotate(this.angle.toRadians());
 					ctx.translate(-this.cx, -this.cy);
 				}
-				this.unapply = function(ctx) {
+				this.unapply = function (ctx) {
 					ctx.translate(this.cx, this.cy);
 					ctx.rotate(-1.0 * this.angle.toRadians());
 					ctx.translate(-this.cx, -this.cy);
 				}
-				this.applyToPoint = function(p) {
+				this.applyToPoint = function (p) {
 					var a = this.angle.toRadians();
 					p.applyTransform([1, 0, 0, 1, this.p.x || 0.0, this.p.y || 0.0]);
 					p.applyTransform([Math.cos(a), Math.sin(a), -Math.sin(a), Math.cos(a),
@@ -704,26 +706,26 @@ var path = require('path');
 				}
 			}
 
-			this.Type.scale = function(s) {
+			this.Type.scale = function (s) {
 				this.p = svg.CreatePoint(s);
-				this.apply = function(ctx) {
+				this.apply = function (ctx) {
 					ctx.scale(this.p.x || 1.0, this.p.y || this.p.x || 1.0);
 				}
-				this.unapply = function(ctx) {
+				this.unapply = function (ctx) {
 					ctx.scale(1.0 / this.p.x || 1.0, 1.0 / this.p.y || this.p.x || 1.0);
 				}
-				this.applyToPoint = function(p) {
+				this.applyToPoint = function (p) {
 					p.applyTransform([this.p.x || 0.0, 0, 0, this.p.y || 0.0, 0, 0]);
 				}
 			}
 
-			this.Type.matrix = function(s) {
+			this.Type.matrix = function (s) {
 				this.m = svg.ToNumberArray(s);
-				this.apply = function(ctx) {
+				this.apply = function (ctx) {
 					ctx.transform(this.m[0], this.m[1], this.m[2], this.m[3], this.m[4],
 						this.m[5]);
 				}
-				this.unapply = function(ctx) {
+				this.unapply = function (ctx) {
 					var a = this.m[0];
 					var b = this.m[2];
 					var c = this.m[4];
@@ -744,26 +746,26 @@ var path = require('path');
 						det * (c * d - a * f)
 					);
 				}
-				this.applyToPoint = function(p) {
+				this.applyToPoint = function (p) {
 					p.applyTransform(this.m);
 				}
 			}
 
-			this.Type.SkewBase = function(s) {
+			this.Type.SkewBase = function (s) {
 				this.base = that.Type.matrix;
 				this.base(s);
 				this.angle = new svg.Property('angle', s);
 			}
 			this.Type.SkewBase.prototype = new this.Type.matrix;
 
-			this.Type.skewX = function(s) {
+			this.Type.skewX = function (s) {
 				this.base = that.Type.SkewBase;
 				this.base(s);
 				this.m = [1, 0, Math.tan(this.angle.toRadians()), 1, 0, 0];
 			}
 			this.Type.skewX.prototype = new this.Type.SkewBase;
 
-			this.Type.skewY = function(s) {
+			this.Type.skewY = function (s) {
 				this.base = that.Type.SkewBase;
 				this.base(s);
 				this.m = [1, Math.tan(this.angle.toRadians()), 0, 1, 0, 0];
@@ -772,19 +774,19 @@ var path = require('path');
 
 			this.transforms = [];
 
-			this.apply = function(ctx) {
+			this.apply = function (ctx) {
 				for (var i = 0; i < this.transforms.length; i++) {
 					this.transforms[i].apply(ctx);
 				}
 			}
 
-			this.unapply = function(ctx) {
+			this.unapply = function (ctx) {
 				for (var i = this.transforms.length - 1; i >= 0; i--) {
 					this.transforms[i].unapply(ctx);
 				}
 			}
 
-			this.applyToPoint = function(p) {
+			this.applyToPoint = function (p) {
 				for (var i = 0; i < this.transforms.length; i++) {
 					this.transforms[i].applyToPoint(p);
 				}
@@ -805,7 +807,7 @@ var path = require('path');
 		}
 
 		// aspect ratio
-		svg.AspectRatio = function(ctx, aspectRatio, width, desiredWidth, height,
+		svg.AspectRatio = function (ctx, aspectRatio, width, desiredWidth, height,
 			desiredHeight, minX, minY, refX, refY) {
 			// aspect ratio - http://www.w3.org/TR/SVG/coords.html#PreserveAspectRatioAttribute
 			aspectRatio = svg.compressSpaces(aspectRatio);
@@ -835,17 +837,17 @@ var path = require('path');
 			} else {
 				// align
 				if (align.match(/^xMid/) && ((meetOrSlice == 'meet' && scaleMin ==
-						scaleY) || (meetOrSlice == 'slice' && scaleMax == scaleY))) ctx.translate(
-					width / 2.0 - desiredWidth / 2.0, 0);
+					scaleY) || (meetOrSlice == 'slice' && scaleMax == scaleY))) ctx.translate(
+						width / 2.0 - desiredWidth / 2.0, 0);
 				if (align.match(/YMid$/) && ((meetOrSlice == 'meet' && scaleMin ==
-						scaleX) || (meetOrSlice == 'slice' && scaleMax == scaleX))) ctx.translate(
-					0, height / 2.0 - desiredHeight / 2.0);
+					scaleX) || (meetOrSlice == 'slice' && scaleMax == scaleX))) ctx.translate(
+						0, height / 2.0 - desiredHeight / 2.0);
 				if (align.match(/^xMax/) && ((meetOrSlice == 'meet' && scaleMin ==
-						scaleY) || (meetOrSlice == 'slice' && scaleMax == scaleY))) ctx.translate(
-					width - desiredWidth, 0);
+					scaleY) || (meetOrSlice == 'slice' && scaleMax == scaleY))) ctx.translate(
+						width - desiredWidth, 0);
 				if (align.match(/YMax$/) && ((meetOrSlice == 'meet' && scaleMin ==
-						scaleX) || (meetOrSlice == 'slice' && scaleMax == scaleX))) ctx.translate(
-					0, height - desiredHeight);
+					scaleX) || (meetOrSlice == 'slice' && scaleMax == scaleX))) ctx.translate(
+						0, height - desiredHeight);
 			}
 
 			// scale
@@ -862,14 +864,14 @@ var path = require('path');
 
 		svg.EmptyProperty = new svg.Property('EMPTY', '');
 
-		svg.Element.ElementBase = function(node) {
+		svg.Element.ElementBase = function (node) {
 			this.attributes = {};
 			this.styles = {};
 			this.stylesSpecificity = {};
 			this.children = [];
 
 			// get or create attribute
-			this.attribute = function(name, createIfNotExists) {
+			this.attribute = function (name, createIfNotExists) {
 				var a = this.attributes[name];
 				if (a != null) return a;
 
@@ -880,7 +882,7 @@ var path = require('path');
 				return a || svg.EmptyProperty;
 			}
 
-			this.getHrefAttribute = function() {
+			this.getHrefAttribute = function () {
 				for (var a in this.attributes) {
 					if (a == 'href' || a.match(/:href$/)) {
 						return this.attributes[a];
@@ -890,7 +892,7 @@ var path = require('path');
 			}
 
 			// get or create style, crawls up node tree
-			this.style = function(name, createIfNotExists, skipAncestors) {
+			this.style = function (name, createIfNotExists, skipAncestors) {
 				var s = this.styles[name];
 				if (s != null) return s;
 
@@ -918,7 +920,7 @@ var path = require('path');
 			}
 
 			// base render
-			this.render = function(ctx) {
+			this.render = function (ctx) {
 				// don't render display=none
 				if (this.style('display').value == 'none') return;
 
@@ -927,43 +929,43 @@ var path = require('path');
 
 				ctx.save();
 				//ss
-                try {
-                    if (this.style('mask').hasValue()) { // mask
-                        var mask = this.style('mask').getDefinition();
-                        if (mask != null) mask.apply(ctx, this);
-                    } else if (this.style('filter').hasValue()) { // filter
-                        var filter = this.style('filter').getDefinition();
-                        if (filter != null) filter.apply(ctx, this);
-                    } else {
-                        this.setContext(ctx);
-                        this.renderChildren(ctx);
-                        this.clearContext(ctx);
-                    }
-                } catch (e) {
-                	console.warn('A rendering error occurred and was ignored.');
-                }
-                //ss end
+				try {
+					if (this.style('mask').hasValue()) { // mask
+						var mask = this.style('mask').getDefinition();
+						if (mask != null) mask.apply(ctx, this);
+					} else if (this.style('filter').hasValue()) { // filter
+						var filter = this.style('filter').getDefinition();
+						if (filter != null) filter.apply(ctx, this);
+					} else {
+						this.setContext(ctx);
+						this.renderChildren(ctx);
+						this.clearContext(ctx);
+					}
+				} catch (e) {
+					console.warn('A rendering error occurred and was ignored.');
+				}
+				//ss end
 				ctx.restore();
 			}
 
 			// base set context
-			this.setContext = function(ctx) {
+			this.setContext = function (ctx) {
 				// OVERRIDE ME!
 			}
 
 			// base clear context
-			this.clearContext = function(ctx) {
+			this.clearContext = function (ctx) {
 				// OVERRIDE ME!
 			}
 
 			// base render children
-			this.renderChildren = function(ctx) {
+			this.renderChildren = function (ctx) {
 				for (var i = 0; i < this.children.length; i++) {
 					this.children[i].render(ctx);
 				}
 			}
 
-			this.addChild = function(childNode, create) {
+			this.addChild = function (childNode, create) {
 				var child = childNode;
 				if (create) child = svg.CreateElement(childNode);
 				child.parent = this;
@@ -972,7 +974,7 @@ var path = require('path');
 				}
 			}
 
-			this.addStylesFromStyleDefinition = function() {
+			this.addStylesFromStyleDefinition = function () {
 				// add styles
 				for (var selector in svg.Styles) {
 					if (selector[0] != '@' && matchesSelector(node, selector)) {
@@ -996,7 +998,7 @@ var path = require('path');
 
 			// Microsoft Edge fix
 			var allUppercase = new RegExp("^[A-Z\-]+$");
-			var normalizeAttributeName = function(name) {
+			var normalizeAttributeName = function (name) {
 				if (allUppercase.test(name)) {
 					return name.toLowerCase();
 				}
@@ -1038,7 +1040,7 @@ var path = require('path');
 					var childNode = node.childNodes[i];
 					if (childNode.nodeType == 1) this.addChild(childNode, true); //ELEMENT_NODE
 					if (this.captureTextNodes && (childNode.nodeType == 3 || childNode.nodeType ==
-							4)) {
+						4)) {
 						var text = childNode.value || childNode.text || childNode.textContent ||
 							'';
 						if (svg.compressSpaces(text) != '') {
@@ -1049,11 +1051,11 @@ var path = require('path');
 			}
 		}
 
-		svg.Element.RenderedElementBase = function(node) {
+		svg.Element.RenderedElementBase = function (node) {
 			this.base = svg.Element.ElementBase;
 			this.base(node);
 
-			this.setContext = function(ctx) {
+			this.setContext = function (ctx) {
 				// fill
 				if (this.style('fill').isUrlDefinition()) {
 					var fs = this.style('fill').getFillStyleDefinition(this, this.style(
@@ -1100,14 +1102,14 @@ var path = require('path');
 				if (this.style('stroke-miterlimit').hasValue()) ctx.miterLimit = this.style(
 					'stroke-miterlimit').value;
 				if (this.style('stroke-dasharray').hasValue() && this.style(
-						'stroke-dasharray').value != 'none') {
+					'stroke-dasharray').value != 'none') {
 					var gaps = svg.ToNumberArray(this.style('stroke-dasharray').value);
 					if (typeof ctx.setLineDash != 'undefined') {
 						ctx.setLineDash(gaps);
 					} else if (typeof ctx.webkitLineDash != 'undefined') {
 						ctx.webkitLineDash = gaps;
 					} else if (typeof ctx.mozDash != 'undefined' && !(gaps.length == 1 &&
-							gaps[0] == 0)) {
+						gaps[0] == 0)) {
 						ctx.mozDash = gaps;
 					}
 
@@ -1128,7 +1130,7 @@ var path = require('path');
 						this.style('font-variant').value,
 						this.style('font-weight').value,
 						this.style('font-size').hasValue() ? this.style('font-size').toPixels() +
-						'px' : '',
+							'px' : '',
 						this.style('font-family').value).toString();
 				}
 
@@ -1153,16 +1155,16 @@ var path = require('path');
 		}
 		svg.Element.RenderedElementBase.prototype = new svg.Element.ElementBase;
 
-		svg.Element.PathElementBase = function(node) {
+		svg.Element.PathElementBase = function (node) {
 			this.base = svg.Element.RenderedElementBase;
 			this.base(node);
 
-			this.path = function(ctx) {
+			this.path = function (ctx) {
 				if (ctx != null) ctx.beginPath();
 				return new svg.BoundingBox();
 			}
 
-			this.renderChildren = function(ctx) {
+			this.renderChildren = function (ctx) {
 				this.path(ctx);
 				svg.Mouse.checkPath(this, ctx);
 				if (ctx.fillStyle != '') {
@@ -1194,29 +1196,29 @@ var path = require('path');
 				}
 			}
 
-			this.getBoundingBox = function() {
+			this.getBoundingBox = function () {
 				return this.path();
 			}
 
-			this.getMarkers = function() {
+			this.getMarkers = function () {
 				return null;
 			}
 		}
 		svg.Element.PathElementBase.prototype = new svg.Element.RenderedElementBase;
 
 		// svg element
-		svg.Element.svg = function(node) {
+		svg.Element.svg = function (node) {
 			this.base = svg.Element.RenderedElementBase;
 			this.base(node);
 
 			this.baseClearContext = this.clearContext;
-			this.clearContext = function(ctx) {
+			this.clearContext = function (ctx) {
 				this.baseClearContext(ctx);
 				svg.ViewPort.RemoveCurrent();
 			}
 
 			this.baseSetContext = this.setContext;
-			this.setContext = function(ctx) {
+			this.setContext = function (ctx) {
 				// initial values and defaults
 				ctx.strokeStyle = 'rgba(0,0,0,0)';
 				ctx.lineCap = 'butt';
@@ -1302,11 +1304,11 @@ var path = require('path');
 		svg.Element.svg.prototype = new svg.Element.RenderedElementBase;
 
 		// rect element
-		svg.Element.rect = function(node) {
+		svg.Element.rect = function (node) {
 			this.base = svg.Element.PathElementBase;
 			this.base(node);
 
-			this.path = function(ctx) {
+			this.path = function (ctx) {
 				var x = this.attribute('x').toPixels('x');
 				var y = this.attribute('y').toPixels('y');
 				var width = this.attribute('width').toPixels('x');
@@ -1339,11 +1341,11 @@ var path = require('path');
 		svg.Element.rect.prototype = new svg.Element.PathElementBase;
 
 		// circle element
-		svg.Element.circle = function(node) {
+		svg.Element.circle = function (node) {
 			this.base = svg.Element.PathElementBase;
 			this.base(node);
 
-			this.path = function(ctx) {
+			this.path = function (ctx) {
 				var cx = this.attribute('cx').toPixels('x');
 				var cy = this.attribute('cy').toPixels('y');
 				var r = this.attribute('r').toPixels();
@@ -1360,11 +1362,11 @@ var path = require('path');
 		svg.Element.circle.prototype = new svg.Element.PathElementBase;
 
 		// ellipse element
-		svg.Element.ellipse = function(node) {
+		svg.Element.ellipse = function (node) {
 			this.base = svg.Element.PathElementBase;
 			this.base(node);
 
-			this.path = function(ctx) {
+			this.path = function (ctx) {
 				var KAPPA = 4 * ((Math.sqrt(2) - 1) / 3);
 				var rx = this.attribute('rx').toPixels('x');
 				var ry = this.attribute('ry').toPixels('y');
@@ -1391,11 +1393,11 @@ var path = require('path');
 		svg.Element.ellipse.prototype = new svg.Element.PathElementBase;
 
 		// line element
-		svg.Element.line = function(node) {
+		svg.Element.line = function (node) {
 			this.base = svg.Element.PathElementBase;
 			this.base(node);
 
-			this.getPoints = function() {
+			this.getPoints = function () {
 				return [
 					new svg.Point(this.attribute('x1').toPixels('x'), this.attribute('y1')
 						.toPixels('y')),
@@ -1404,7 +1406,7 @@ var path = require('path');
 				];
 			}
 
-			this.path = function(ctx) {
+			this.path = function (ctx) {
 				var points = this.getPoints();
 
 				if (ctx != null) {
@@ -1417,7 +1419,7 @@ var path = require('path');
 					points[1].y);
 			}
 
-			this.getMarkers = function() {
+			this.getMarkers = function () {
 				var points = this.getPoints();
 				var a = points[0].angleTo(points[1]);
 				return [
@@ -1429,12 +1431,12 @@ var path = require('path');
 		svg.Element.line.prototype = new svg.Element.PathElementBase;
 
 		// polyline element
-		svg.Element.polyline = function(node) {
+		svg.Element.polyline = function (node) {
 			this.base = svg.Element.PathElementBase;
 			this.base(node);
 
 			this.points = svg.CreatePath(this.attribute('points').value);
-			this.path = function(ctx) {
+			this.path = function (ctx) {
 				var bb = new svg.BoundingBox(this.points[0].x, this.points[0].y);
 				if (ctx != null) {
 					ctx.beginPath();
@@ -1447,7 +1449,7 @@ var path = require('path');
 				return bb;
 			}
 
-			this.getMarkers = function() {
+			this.getMarkers = function () {
 				var markers = [];
 				for (var i = 0; i < this.points.length - 1; i++) {
 					markers.push([this.points[i], this.points[i].angleTo(this.points[i + 1])]);
@@ -1462,12 +1464,12 @@ var path = require('path');
 		svg.Element.polyline.prototype = new svg.Element.PathElementBase;
 
 		// polygon element
-		svg.Element.polygon = function(node) {
+		svg.Element.polygon = function (node) {
 			this.base = svg.Element.polyline;
 			this.base(node);
 
 			this.basePath = this.path;
-			this.path = function(ctx) {
+			this.path = function (ctx) {
 				var bb = this.basePath(ctx);
 				if (ctx != null) {
 					ctx.lineTo(this.points[0].x, this.points[0].y);
@@ -1479,7 +1481,7 @@ var path = require('path');
 		svg.Element.polygon.prototype = new svg.Element.polyline;
 
 		// path element
-		svg.Element.path = function(node) {
+		svg.Element.path = function (node) {
 			this.base = svg.Element.PathElementBase;
 			this.base(node);
 
@@ -1497,10 +1499,10 @@ var path = require('path');
 			d = d.replace(/([Aa](\s+[0-9]+){3})\s+([01])\s*([01])/gm, '$1 $3 $4 '); // shorthand elliptical arc path syntax
 			d = svg.compressSpaces(d); // compress multiple spaces
 			d = svg.trim(d);
-			this.PathParser = new(function(d) {
+			this.PathParser = new (function (d) {
 				this.tokens = d.split(' ');
 
-				this.reset = function() {
+				this.reset = function () {
 					this.i = -1;
 					this.command = '';
 					this.previousCommand = '';
@@ -1511,16 +1513,16 @@ var path = require('path');
 					this.angles = [];
 				}
 
-				this.isEnd = function() {
+				this.isEnd = function () {
 					return this.i >= this.tokens.length - 1;
 				}
 
-				this.isCommandOrEnd = function() {
+				this.isCommandOrEnd = function () {
 					if (this.isEnd()) return true;
 					return this.tokens[this.i + 1].match(/^[A-Za-z]$/) != null;
 				}
 
-				this.isRelativeCommand = function() {
+				this.isRelativeCommand = function () {
 					switch (this.command) {
 						case 'm':
 						case 'l':
@@ -1538,38 +1540,38 @@ var path = require('path');
 					return false;
 				}
 
-				this.getToken = function() {
+				this.getToken = function () {
 					this.i++;
 					return this.tokens[this.i];
 				}
 
-				this.getScalar = function() {
+				this.getScalar = function () {
 					return parseFloat(this.getToken());
 				}
 
-				this.nextCommand = function() {
+				this.nextCommand = function () {
 					this.previousCommand = this.command;
 					this.command = this.getToken();
 				}
 
-				this.getPoint = function() {
+				this.getPoint = function () {
 					var p = new svg.Point(this.getScalar(), this.getScalar());
 					return this.makeAbsolute(p);
 				}
 
-				this.getAsControlPoint = function() {
+				this.getAsControlPoint = function () {
 					var p = this.getPoint();
 					this.control = p;
 					return p;
 				}
 
-				this.getAsCurrentPoint = function() {
+				this.getAsCurrentPoint = function () {
 					var p = this.getPoint();
 					this.current = p;
 					return p;
 				}
 
-				this.getReflectedControlPoint = function() {
+				this.getReflectedControlPoint = function () {
 					if (this.previousCommand.toLowerCase() != 'c' &&
 						this.previousCommand.toLowerCase() != 's' &&
 						this.previousCommand.toLowerCase() != 'q' &&
@@ -1583,7 +1585,7 @@ var path = require('path');
 					return p;
 				}
 
-				this.makeAbsolute = function(p) {
+				this.makeAbsolute = function (p) {
 					if (this.isRelativeCommand()) {
 						p.x += this.current.x;
 						p.y += this.current.y;
@@ -1591,25 +1593,25 @@ var path = require('path');
 					return p;
 				}
 
-				this.addMarker = function(p, from, priorTo) {
+				this.addMarker = function (p, from, priorTo) {
 					// if the last angle isn't filled in because we didn't have this point yet ...
 					if (priorTo != null && this.angles.length > 0 && this.angles[this.angles
-							.length - 1] == null) {
+						.length - 1] == null) {
 						this.angles[this.angles.length - 1] = this.points[this.points.length -
 							1].angleTo(priorTo);
 					}
 					this.addMarkerAngle(p, from == null ? null : from.angleTo(p));
 				}
 
-				this.addMarkerAngle = function(p, a) {
+				this.addMarkerAngle = function (p, a) {
 					this.points.push(p);
 					this.angles.push(a);
 				}
 
-				this.getMarkerPoints = function() {
+				this.getMarkerPoints = function () {
 					return this.points;
 				}
-				this.getMarkerAngles = function() {
+				this.getMarkerAngles = function () {
 					for (var i = 0; i < this.angles.length; i++) {
 						if (this.angles[i] == null) {
 							for (var j = i + 1; j < this.angles.length; j++) {
@@ -1624,7 +1626,7 @@ var path = require('path');
 				}
 			})(d);
 
-			this.path = function(ctx) {
+			this.path = function (ctx) {
 				var pp = this.PathParser;
 				pp.reset();
 
@@ -1747,7 +1749,7 @@ var path = require('path');
 								var currp = new svg.Point(
 									Math.cos(xAxisRotation) * (curr.x - cp.x) / 2.0 + Math.sin(
 										xAxisRotation) * (curr.y - cp.y) / 2.0, -Math.sin(xAxisRotation) *
-									(curr.x - cp.x) / 2.0 + Math.cos(xAxisRotation) * (curr.y - cp.y) /
+										(curr.x - cp.x) / 2.0 + Math.cos(xAxisRotation) * (curr.y - cp.y) /
 									2.0
 								);
 								// adjust radii
@@ -1771,31 +1773,31 @@ var path = require('path');
 								var centp = new svg.Point(
 									(curr.x + cp.x) / 2.0 + Math.cos(xAxisRotation) * cpp.x - Math.sin(
 										xAxisRotation) * cpp.y, (curr.y + cp.y) / 2.0 + Math.sin(
-										xAxisRotation) * cpp.x + Math.cos(xAxisRotation) * cpp.y
+											xAxisRotation) * cpp.x + Math.cos(xAxisRotation) * cpp.y
 								);
 								// vector magnitude
-								var m = function(v) {
-										return Math.sqrt(Math.pow(v[0], 2) + Math.pow(v[1], 2));
-									}
-									// ratio between two vectors
-								var r = function(u, v) {
-										return (u[0] * v[0] + u[1] * v[1]) / (m(u) * m(v))
-									}
-									// angle between two vectors
-								var a = function(u, v) {
-										return (u[0] * v[1] < u[1] * v[0] ? -1 : 1) * Math.acos(r(u, v));
-									}
-									// initial angle
+								var m = function (v) {
+									return Math.sqrt(Math.pow(v[0], 2) + Math.pow(v[1], 2));
+								}
+								// ratio between two vectors
+								var r = function (u, v) {
+									return (u[0] * v[0] + u[1] * v[1]) / (m(u) * m(v))
+								}
+								// angle between two vectors
+								var a = function (u, v) {
+									return (u[0] * v[1] < u[1] * v[0] ? -1 : 1) * Math.acos(r(u, v));
+								}
+								// initial angle
 								var a1 = a([1, 0], [(currp.x - cpp.x) / rx, (currp.y - cpp.y) / ry]);
-								
+
 								//ss 
 								//<path fill="#919191" d="M-78.57679247853098,37.66125568519824 A87.136,87.136 0 0,1 -78.57679247853098,37.66125568519824L0,0Z"></path>
 								// was causing an issue (s was ending up as Infinity
-								if (isNaN(a1) ){
+								if (isNaN(a1)) {
 									continue;
 								}
 								//ss end
-								
+
 								// angle delta
 								var u = [(currp.x - cpp.x) / rx, (currp.y - cpp.y) / ry];
 								var v = [(-currp.x - cpp.x) / rx, (-currp.y - cpp.y) / ry];
@@ -1812,7 +1814,7 @@ var path = require('path');
 								);
 								pp.addMarkerAngle(halfWay, ah - dir * Math.PI / 2);
 								pp.addMarkerAngle(cp, ah - dir * Math.PI);
-								
+
 								bb.addPoint(cp.x, cp.y); // TODO: this is too naive, make it better
 								if (ctx != null) {
 									var r = rx > ry ? rx : ry;
@@ -1839,7 +1841,7 @@ var path = require('path');
 				return bb;
 			}
 
-			this.getMarkers = function() {
+			this.getMarkers = function () {
 				var points = this.PathParser.getMarkerPoints();
 				var angles = this.PathParser.getMarkerAngles();
 
@@ -1853,11 +1855,11 @@ var path = require('path');
 		svg.Element.path.prototype = new svg.Element.PathElementBase;
 
 		// pattern element
-		svg.Element.pattern = function(node) {
+		svg.Element.pattern = function (node) {
 			this.base = svg.Element.ElementBase;
 			this.base(node);
 
-			this.createPattern = function(ctx, element) {
+			this.createPattern = function (ctx, element) {
 				var width = this.attribute('width').toPixels('x', true);
 				var height = this.attribute('height').toPixels('y', true);
 
@@ -1896,12 +1898,12 @@ var path = require('path');
 		svg.Element.pattern.prototype = new svg.Element.ElementBase;
 
 		// marker element
-		svg.Element.marker = function(node) {
+		svg.Element.marker = function (node) {
 			this.base = svg.Element.ElementBase;
 			this.base(node);
 
 			this.baseRender = this.render;
-			this.render = function(ctx, point, angle) {
+			this.render = function (ctx, point, angle) {
 				ctx.translate(point.x, point.y);
 				if (this.attribute('orient').valueOrDefault('auto') == 'auto') ctx.rotate(
 					angle);
@@ -1939,18 +1941,18 @@ var path = require('path');
 		svg.Element.marker.prototype = new svg.Element.ElementBase;
 
 		// definitions element
-		svg.Element.defs = function(node) {
+		svg.Element.defs = function (node) {
 			this.base = svg.Element.ElementBase;
 			this.base(node);
 
-			this.render = function(ctx) {
+			this.render = function (ctx) {
 				// NOOP
 			}
 		}
 		svg.Element.defs.prototype = new svg.Element.ElementBase;
 
 		// base for gradients
-		svg.Element.GradientBase = function(node) {
+		svg.Element.GradientBase = function (node) {
 			this.base = svg.Element.ElementBase;
 			this.base(node);
 
@@ -1960,36 +1962,36 @@ var path = require('path');
 				if (child.type == 'stop') this.stops.push(child);
 			}
 
-			this.getGradient = function() {
+			this.getGradient = function () {
 				// OVERRIDE ME!
 			}
 
-			this.gradientUnits = function() {
+			this.gradientUnits = function () {
 				return this.attribute('gradientUnits').valueOrDefault(
 					'objectBoundingBox');
 			}
 
 			this.attributesToInherit = ['gradientUnits'];
 
-			this.inheritStopContainer = function(stopsContainer) {
+			this.inheritStopContainer = function (stopsContainer) {
 				for (var i = 0; i < this.attributesToInherit.length; i++) {
 					var attributeToInherit = this.attributesToInherit[i];
 					if (!this.attribute(attributeToInherit).hasValue() && stopsContainer.attribute(
-							attributeToInherit).hasValue()) {
+						attributeToInherit).hasValue()) {
 						this.attribute(attributeToInherit, true).value = stopsContainer.attribute(
 							attributeToInherit).value;
 					}
 				}
 			}
 
-			this.createGradient = function(ctx, element, parentOpacityProp) {
+			this.createGradient = function (ctx, element, parentOpacityProp) {
 				var stopsContainer = this;
 				if (this.getHrefAttribute().hasValue()) {
 					stopsContainer = this.getHrefAttribute().getDefinition();
 					this.inheritStopContainer(stopsContainer);
 				}
 
-				var addParentOpacity = function(color) {
+				var addParentOpacity = function (color) {
 					if (parentOpacityProp.hasValue()) {
 						var p = new svg.Property('color', color);
 						return p.addOpacity(parentOpacityProp).value;
@@ -2044,7 +2046,7 @@ var path = require('path');
 		svg.Element.GradientBase.prototype = new svg.Element.ElementBase;
 
 		// linear gradient element
-		svg.Element.linearGradient = function(node) {
+		svg.Element.linearGradient = function (node) {
 			this.base = svg.Element.GradientBase;
 			this.base(node);
 
@@ -2053,7 +2055,7 @@ var path = require('path');
 			this.attributesToInherit.push('x2');
 			this.attributesToInherit.push('y2');
 
-			this.getGradient = function(ctx, element) {
+			this.getGradient = function (ctx, element) {
 				var bb = this.gradientUnits() == 'objectBoundingBox' ? element.getBoundingBox() :
 					null;
 
@@ -2081,7 +2083,7 @@ var path = require('path');
 		svg.Element.linearGradient.prototype = new svg.Element.GradientBase;
 
 		// radial gradient element
-		svg.Element.radialGradient = function(node) {
+		svg.Element.radialGradient = function (node) {
 			this.base = svg.Element.GradientBase;
 			this.base(node);
 
@@ -2091,7 +2093,7 @@ var path = require('path');
 			this.attributesToInherit.push('fx');
 			this.attributesToInherit.push('fy');
 
-			this.getGradient = function(ctx, element) {
+			this.getGradient = function (ctx, element) {
 				var bb = element.getBoundingBox();
 
 				if (!this.attribute('cx').hasValue()) this.attribute('cx', true).value =
@@ -2121,7 +2123,7 @@ var path = require('path');
 
 				var r = (this.gradientUnits() == 'objectBoundingBox' ? (bb.width() + bb
 					.height()) / 2.0 * this.attribute('r').numValue() : this.attribute(
-					'r').toPixels());
+						'r').toPixels());
 
 				return ctx.createRadialGradient(fx, fy, 0, cx, cy, r);
 			}
@@ -2129,7 +2131,7 @@ var path = require('path');
 		svg.Element.radialGradient.prototype = new svg.Element.GradientBase;
 
 		// gradient stop element
-		svg.Element.stop = function(node) {
+		svg.Element.stop = function (node) {
 			this.base = svg.Element.ElementBase;
 			this.base(node);
 
@@ -2146,7 +2148,7 @@ var path = require('path');
 		svg.Element.stop.prototype = new svg.Element.ElementBase;
 
 		// animation base element
-		svg.Element.AnimateBase = function(node) {
+		svg.Element.AnimateBase = function (node) {
 			this.base = svg.Element.ElementBase;
 			this.base(node);
 
@@ -2156,7 +2158,7 @@ var path = require('path');
 			this.begin = this.attribute('begin').toMilliseconds();
 			this.maxDuration = this.begin + this.attribute('dur').toMilliseconds();
 
-			this.getProperty = function() {
+			this.getProperty = function () {
 				var attributeType = this.attribute('attributeType').value;
 				var attributeName = this.attribute('attributeName').value;
 
@@ -2170,12 +2172,12 @@ var path = require('path');
 			this.initialUnits = '';
 			this.removed = false;
 
-			this.calcValue = function() {
+			this.calcValue = function () {
 				// OVERRIDE ME!
 				return '';
 			}
 
-			this.update = function(delta) {
+			this.update = function (delta) {
 				// set initial value
 				if (this.initialValue == null) {
 					this.initialValue = this.getProperty().value;
@@ -2186,7 +2188,7 @@ var path = require('path');
 				if (this.duration > this.maxDuration) {
 					// loop for indefinitely repeating animations
 					if (this.attribute('repeatCount').value == 'indefinite' || this.attribute(
-							'repeatDur').value == 'indefinite') {
+						'repeatDur').value == 'indefinite') {
 						this.duration = 0.0
 					} else if (this.attribute('fill').valueOrDefault('remove') == 'freeze' &&
 						!this.frozen) {
@@ -2229,7 +2231,7 @@ var path = require('path');
 				';');
 
 			// fraction of duration we've covered
-			this.progress = function() {
+			this.progress = function () {
 				var ret = {
 					progress: (this.duration - this.begin) / (this.maxDuration - this.begin)
 				};
@@ -2250,11 +2252,11 @@ var path = require('path');
 		svg.Element.AnimateBase.prototype = new svg.Element.ElementBase;
 
 		// animate element
-		svg.Element.animate = function(node) {
+		svg.Element.animate = function (node) {
 			this.base = svg.Element.AnimateBase;
 			this.base(node);
 
-			this.calcValue = function() {
+			this.calcValue = function () {
 				var p = this.progress();
 
 				// tween value linearly
@@ -2266,11 +2268,11 @@ var path = require('path');
 		svg.Element.animate.prototype = new svg.Element.AnimateBase;
 
 		// animate color element
-		svg.Element.animateColor = function(node) {
+		svg.Element.animateColor = function (node) {
 			this.base = svg.Element.AnimateBase;
 			this.base(node);
 
-			this.calcValue = function() {
+			this.calcValue = function () {
 				var p = this.progress();
 				var from = new RGBColor(p.from.value);
 				var to = new RGBColor(p.to.value);
@@ -2289,11 +2291,11 @@ var path = require('path');
 		svg.Element.animateColor.prototype = new svg.Element.AnimateBase;
 
 		// animate transform element
-		svg.Element.animateTransform = function(node) {
+		svg.Element.animateTransform = function (node) {
 			this.base = svg.Element.AnimateBase;
 			this.base(node);
 
-			this.calcValue = function() {
+			this.calcValue = function () {
 				var p = this.progress();
 
 				// tween value linearly
@@ -2309,7 +2311,7 @@ var path = require('path');
 		svg.Element.animateTransform.prototype = new svg.Element.animate;
 
 		// font element
-		svg.Element.font = function(node) {
+		svg.Element.font = function (node) {
 			this.base = svg.Element.ElementBase;
 			this.base(node);
 
@@ -2344,7 +2346,7 @@ var path = require('path');
 		svg.Element.font.prototype = new svg.Element.ElementBase;
 
 		// font-face element
-		svg.Element.fontface = function(node) {
+		svg.Element.fontface = function (node) {
 			this.base = svg.Element.ElementBase;
 			this.base(node);
 
@@ -2355,7 +2357,7 @@ var path = require('path');
 		svg.Element.fontface.prototype = new svg.Element.ElementBase;
 
 		// missing-glyph element
-		svg.Element.missingglyph = function(node) {
+		svg.Element.missingglyph = function (node) {
 			this.base = svg.Element.path;
 			this.base(node);
 
@@ -2364,7 +2366,7 @@ var path = require('path');
 		svg.Element.missingglyph.prototype = new svg.Element.path;
 
 		// glyph element
-		svg.Element.glyph = function(node) {
+		svg.Element.glyph = function (node) {
 			this.base = svg.Element.path;
 			this.base(node);
 
@@ -2375,13 +2377,13 @@ var path = require('path');
 		svg.Element.glyph.prototype = new svg.Element.path;
 
 		// text element
-		svg.Element.text = function(node) {
+		svg.Element.text = function (node) {
 			this.captureTextNodes = true;
 			this.base = svg.Element.RenderedElementBase;
 			this.base(node);
 
 			this.baseSetContext = this.setContext;
-			this.setContext = function(ctx) {
+			this.setContext = function (ctx) {
 				this.baseSetContext(ctx);
 
 				var textBaseline = this.style('dominant-baseline').toTextBaseline();
@@ -2390,7 +2392,7 @@ var path = require('path');
 				if (textBaseline != null) ctx.textBaseline = textBaseline;
 			}
 
-			this.getBoundingBox = function() {
+			this.getBoundingBox = function () {
 				var x = this.attribute('x').toPixels('x');
 				var y = this.attribute('y').toPixels('y');
 				var fontSize = this.parent.style('font-size').numValueOrDefault(svg.Font
@@ -2399,7 +2401,7 @@ var path = require('path');
 					2.0 / 3.0) * this.children[0].getText().length, y);
 			}
 
-			this.renderChildren = function(ctx) {
+			this.renderChildren = function (ctx) {
 				this.x = this.attribute('x').toPixels('x');
 				this.y = this.attribute('y').toPixels('y');
 				if (this.attribute('dx').hasValue()) this.x += this.attribute('dx').toPixels(
@@ -2412,7 +2414,7 @@ var path = require('path');
 				}
 			}
 
-			this.getAnchorDelta = function(ctx, parent, startI) {
+			this.getAnchorDelta = function (ctx, parent, startI) {
 				var textAnchor = this.style('text-anchor').valueOrDefault('start');
 				if (textAnchor != 'start') {
 					var width = 0;
@@ -2426,7 +2428,7 @@ var path = require('path');
 				return 0;
 			}
 
-			this.renderChild = function(ctx, textParent, parent, i) {
+			this.renderChild = function (ctx, textParent, parent, i) {
 				var child = parent.children[i];
 				if (child.attribute('x').hasValue()) {
 					child.x = child.attribute('x').toPixels('x') + textParent.getAnchorDelta(
@@ -2461,21 +2463,21 @@ var path = require('path');
 		svg.Element.text.prototype = new svg.Element.RenderedElementBase;
 
 		// text base
-		svg.Element.TextElementBase = function(node) {
+		svg.Element.TextElementBase = function (node) {
 			this.base = svg.Element.RenderedElementBase;
 			this.base(node);
 
-			this.getGlyph = function(font, text, i) {
+			this.getGlyph = function (font, text, i) {
 				var c = text[i];
 				var glyph = null;
 				if (font.isArabic) {
 					var arabicForm = 'isolated';
 					if ((i == 0 || text[i - 1] == ' ') && i < text.length - 2 && text[i +
-							1] != ' ') arabicForm = 'terminal';
+						1] != ' ') arabicForm = 'terminal';
 					if (i > 0 && text[i - 1] != ' ' && i < text.length - 2 && text[i + 1] !=
 						' ') arabicForm = 'medial';
 					if (i > 0 && text[i - 1] != ' ' && (i == text.length - 1 || text[i + 1] ==
-							' ')) arabicForm = 'initial';
+						' ')) arabicForm = 'initial';
 					if (typeof font.glyphs[c] != 'undefined') {
 						glyph = font.glyphs[c][arabicForm];
 						if (glyph == null && font.glyphs[c].type == 'glyph') glyph = font.glyphs[
@@ -2488,7 +2490,7 @@ var path = require('path');
 				return glyph;
 			}
 
-			this.renderChildren = function(ctx) {
+			this.renderChildren = function (ctx) {
 				var customFont = this.parent.style('font-family').getDefinition();
 				if (customFont != null) {
 					var fontSize = this.parent.style('font-size').numValueOrDefault(svg.Font
@@ -2529,11 +2531,11 @@ var path = require('path');
 					this.x, this.y);
 			}
 
-			this.getText = function() {
+			this.getText = function () {
 				// OVERRIDE ME
 			}
 
-			this.measureTextRecursive = function(ctx) {
+			this.measureTextRecursive = function (ctx) {
 				var width = this.measureText(ctx);
 				for (var i = 0; i < this.children.length; i++) {
 					width += this.children[i].measureTextRecursive(ctx);
@@ -2541,7 +2543,7 @@ var path = require('path');
 				return width;
 			}
 
-			this.measureText = function(ctx) {
+			this.measureText = function (ctx) {
 				var customFont = this.parent.style('font-family').getDefinition();
 				if (customFont != null) {
 					var fontSize = this.parent.style('font-size').numValueOrDefault(svg.Font
@@ -2574,14 +2576,14 @@ var path = require('path');
 		svg.Element.TextElementBase.prototype = new svg.Element.RenderedElementBase;
 
 		// tspan
-		svg.Element.tspan = function(node) {
+		svg.Element.tspan = function (node) {
 			this.captureTextNodes = true;
 			this.base = svg.Element.TextElementBase;
 			this.base(node);
 
 			this.text = svg.compressSpaces(node.value || node.text || node.textContent ||
 				'');
-			this.getText = function() {
+			this.getText = function () {
 				// if this node has children, then they own the text
 				if (this.children.length > 0) {
 					return '';
@@ -2592,11 +2594,11 @@ var path = require('path');
 		svg.Element.tspan.prototype = new svg.Element.TextElementBase;
 
 		// tref
-		svg.Element.tref = function(node) {
+		svg.Element.tref = function (node) {
 			this.base = svg.Element.TextElementBase;
 			this.base(node);
 
-			this.getText = function() {
+			this.getText = function () {
 				var element = this.getHrefAttribute().getDefinition();
 				if (element != null) return element.children[0].getText();
 			}
@@ -2604,7 +2606,7 @@ var path = require('path');
 		svg.Element.tref.prototype = new svg.Element.TextElementBase;
 
 		// a element
-		svg.Element.a = function(node) {
+		svg.Element.a = function (node) {
 			this.base = svg.Element.TextElementBase;
 			this.base(node);
 
@@ -2615,12 +2617,12 @@ var path = require('path');
 
 			// this might contain text
 			this.text = this.hasText ? node.childNodes[0].value : '';
-			this.getText = function() {
+			this.getText = function () {
 				return this.text;
 			}
 
 			this.baseRenderChildren = this.renderChildren;
-			this.renderChildren = function(ctx) {
+			this.renderChildren = function (ctx) {
 				if (this.hasText) {
 					// render as text element
 					this.baseRenderChildren(ctx);
@@ -2637,18 +2639,18 @@ var path = require('path');
 				}
 			}
 
-			this.onclick = function() {
+			this.onclick = function () {
 				window.open(this.getHrefAttribute().value);
 			}
 
-			this.onmousemove = function() {
+			this.onmousemove = function () {
 				svg.ctx.canvas.style.cursor = 'pointer';
 			}
 		}
 		svg.Element.a.prototype = new svg.Element.TextElementBase;
 
 		// image element
-		svg.Element.image = function(node) {
+		svg.Element.image = function (node) {
 			this.base = svg.Element.RenderedElementBase;
 			this.base(node);
 
@@ -2666,10 +2668,10 @@ var path = require('path');
 					this.img.crossOrigin = 'Anonymous';
 				}
 				var self = this;
-				this.img.onload = function() {
+				this.img.onload = function () {
 					self.loaded = true;
 				}
-				this.img.onerror = function() {
+				this.img.onerror = function () {
 					svg.log('ERROR: image "' + href + '" not found');
 					self.loaded = true;
 				}
@@ -2679,7 +2681,7 @@ var path = require('path');
 				this.loaded = true;
 			}
 
-			this.renderChildren = function(ctx) {
+			this.renderChildren = function (ctx) {
 				var x = this.attribute('x').toPixels('x');
 				var y = this.attribute('y').toPixels('y');
 
@@ -2705,7 +2707,7 @@ var path = require('path');
 				ctx.restore();
 			}
 
-			this.getBoundingBox = function() {
+			this.getBoundingBox = function () {
 				var x = this.attribute('x').toPixels('x');
 				var y = this.attribute('y').toPixels('y');
 				var width = this.attribute('width').toPixels('x');
@@ -2716,11 +2718,11 @@ var path = require('path');
 		svg.Element.image.prototype = new svg.Element.RenderedElementBase;
 
 		// group element
-		svg.Element.g = function(node) {
+		svg.Element.g = function (node) {
 			this.base = svg.Element.RenderedElementBase;
 			this.base(node);
 
-			this.getBoundingBox = function() {
+			this.getBoundingBox = function () {
 				var bb = new svg.BoundingBox();
 				for (var i = 0; i < this.children.length; i++) {
 					bb.addBoundingBox(this.children[i].getBoundingBox());
@@ -2731,18 +2733,18 @@ var path = require('path');
 		svg.Element.g.prototype = new svg.Element.RenderedElementBase;
 
 		// symbol element
-		svg.Element.symbol = function(node) {
+		svg.Element.symbol = function (node) {
 			this.base = svg.Element.RenderedElementBase;
 			this.base(node);
 
-			this.render = function(ctx) {
+			this.render = function (ctx) {
 				// NO RENDER
 			};
 		}
 		svg.Element.symbol.prototype = new svg.Element.RenderedElementBase;
 
 		// style element
-		svg.Element.style = function(node) {
+		svg.Element.style = function (node) {
 			this.base = svg.Element.ElementBase;
 			this.base(node);
 
@@ -2800,12 +2802,12 @@ var path = require('path');
 		svg.Element.style.prototype = new svg.Element.ElementBase;
 
 		// use element
-		svg.Element.use = function(node) {
+		svg.Element.use = function (node) {
 			this.base = svg.Element.RenderedElementBase;
 			this.base(node);
 
 			this.baseSetContext = this.setContext;
-			this.setContext = function(ctx) {
+			this.setContext = function (ctx) {
 				this.baseSetContext(ctx);
 				if (this.attribute('x').hasValue()) ctx.translate(this.attribute('x').toPixels(
 					'x'), 0);
@@ -2815,15 +2817,15 @@ var path = require('path');
 
 			var element = this.getHrefAttribute().getDefinition();
 
-			this.path = function(ctx) {
+			this.path = function (ctx) {
 				if (element != null) element.path(ctx);
 			}
 
-			this.getBoundingBox = function() {
+			this.getBoundingBox = function () {
 				if (element != null) return element.getBoundingBox();
 			}
 
-			this.renderChildren = function(ctx) {
+			this.renderChildren = function (ctx) {
 				if (element != null) {
 					var tempSvg = element;
 					if (element.type == 'symbol') {
@@ -2856,11 +2858,11 @@ var path = require('path');
 		svg.Element.use.prototype = new svg.Element.RenderedElementBase;
 
 		// mask element
-		svg.Element.mask = function(node) {
+		svg.Element.mask = function (node) {
 			this.base = svg.Element.ElementBase;
 			this.base(node);
 
-			this.apply = function(ctx, element) {
+			this.apply = function (ctx, element) {
 				// render as temp svg
 				var x = this.attribute('x').toPixels('x');
 				var y = this.attribute('y').toPixels('y');
@@ -2904,18 +2906,18 @@ var path = require('path');
 				element.attribute('mask').value = mask;
 			}
 
-			this.render = function(ctx) {
+			this.render = function (ctx) {
 				// NO RENDER
 			}
 		}
 		svg.Element.mask.prototype = new svg.Element.ElementBase;
 
 		// clip element
-		svg.Element.clipPath = function(node) {
+		svg.Element.clipPath = function (node) {
 			this.base = svg.Element.ElementBase;
 			this.base(node);
 
-			this.apply = function(ctx) {
+			this.apply = function (ctx) {
 				//ss
 				// our mock PDF context cannot be sent into CanvasRenderingContext2D.prototype.beginPath
 				ctx.beginPath();
@@ -2939,10 +2941,10 @@ var path = require('path');
 				//ss end
 
 				var oldBeginPath = CanvasRenderingContext2D.prototype.beginPath;
-				CanvasRenderingContext2D.prototype.beginPath = function() {};
+				CanvasRenderingContext2D.prototype.beginPath = function () { };
 
 				var oldClosePath = CanvasRenderingContext2D.prototype.closePath;
-				CanvasRenderingContext2D.prototype.closePath = function() {};
+				CanvasRenderingContext2D.prototype.closePath = function () { };
 
 				try {
 					oldBeginPath.call(ctx);
@@ -2971,18 +2973,18 @@ var path = require('path');
 				CanvasRenderingContext2D.prototype.closePath = oldClosePath;
 			}
 
-			this.render = function(ctx) {
+			this.render = function (ctx) {
 				// NO RENDER
 			}
 		}
 		svg.Element.clipPath.prototype = new svg.Element.ElementBase;
 
 		// filters
-		svg.Element.filter = function(node) {
+		svg.Element.filter = function (node) {
 			this.base = svg.Element.ElementBase;
 			this.base(node);
 
-			this.apply = function(ctx, element) {
+			this.apply = function (ctx, element) {
 				// render as temp svg
 				var bb = element.getBoundingBox();
 				var x = Math.floor(bb.x1);
@@ -3024,33 +3026,33 @@ var path = require('path');
 				element.style('filter', true).value = filter;
 			}
 
-			this.render = function(ctx) {
+			this.render = function (ctx) {
 				// NO RENDER
 			}
 		}
 		svg.Element.filter.prototype = new svg.Element.ElementBase;
 
-		svg.Element.feMorphology = function(node) {
+		svg.Element.feMorphology = function (node) {
 			this.base = svg.Element.ElementBase;
 			this.base(node);
 
-			this.apply = function(ctx, x, y, width, height) {
+			this.apply = function (ctx, x, y, width, height) {
 				// TODO: implement
 			}
 		}
 		svg.Element.feMorphology.prototype = new svg.Element.ElementBase;
 
-		svg.Element.feComposite = function(node) {
+		svg.Element.feComposite = function (node) {
 			this.base = svg.Element.ElementBase;
 			this.base(node);
 
-			this.apply = function(ctx, x, y, width, height) {
+			this.apply = function (ctx, x, y, width, height) {
 				// TODO: implement
 			}
 		}
 		svg.Element.feComposite.prototype = new svg.Element.ElementBase;
 
-		svg.Element.feColorMatrix = function(node) {
+		svg.Element.feColorMatrix = function (node) {
 			this.base = svg.Element.ElementBase;
 			this.base(node);
 
@@ -3059,23 +3061,23 @@ var path = require('path');
 				case 'saturate':
 					var s = matrix[0];
 					matrix = [0.213 + 0.787 * s, 0.715 - 0.715 * s, 0.072 - 0.072 * s, 0, 0,
-						0.213 - 0.213 * s, 0.715 + 0.285 * s, 0.072 - 0.072 * s, 0, 0,
-						0.213 - 0.213 * s, 0.715 - 0.715 * s, 0.072 + 0.928 * s, 0, 0,
+					0.213 - 0.213 * s, 0.715 + 0.285 * s, 0.072 - 0.072 * s, 0, 0,
+					0.213 - 0.213 * s, 0.715 - 0.715 * s, 0.072 + 0.928 * s, 0, 0,
 						0, 0, 0, 1, 0,
 						0, 0, 0, 0, 1
 					];
 					break;
 				case 'hueRotate':
 					var a = matrix[0] * Math.PI / 180.0;
-					var c = function(m1, m2, m3) {
+					var c = function (m1, m2, m3) {
 						return m1 + Math.cos(a) * m2 + Math.sin(a) * m3;
 					};
 					matrix = [c(0.213, 0.787, -0.213), c(0.715, -0.715, -0.715), c(0.072, -
-							0.072, 0.928), 0, 0,
-						c(0.213, -0.213, 0.143), c(0.715, 0.285, 0.140), c(0.072, -0.072, -
-							0.283), 0, 0,
-						c(0.213, -0.213, -0.787), c(0.715, -0.715, 0.715), c(0.072, 0.928,
-							0.072), 0, 0,
+						0.072, 0.928), 0, 0,
+					c(0.213, -0.213, 0.143), c(0.715, 0.285, 0.140), c(0.072, -0.072, -
+						0.283), 0, 0,
+					c(0.213, -0.213, -0.787), c(0.715, -0.715, 0.715), c(0.072, 0.928,
+						0.072), 0, 0,
 						0, 0, 0, 1, 0,
 						0, 0, 0, 0, 1
 					];
@@ -3103,7 +3105,7 @@ var path = require('path');
 				return mi * (mi < 0 ? v - 255 : v);
 			}
 
-			this.apply = function(ctx, x, y, width, height) {
+			this.apply = function (ctx, x, y, width, height) {
 				// assuming x==0 && y==0 for now
 				var srcData = ctx.getImageData(0, 0, width, height);
 				for (var y = 0; y < height; y++) {
@@ -3128,30 +3130,30 @@ var path = require('path');
 		}
 		svg.Element.feColorMatrix.prototype = new svg.Element.ElementBase;
 
-		svg.Element.feGaussianBlur = function(node) {
+		svg.Element.feGaussianBlur = function (node) {
 			this.base = svg.Element.ElementBase;
 			this.base(node);
 
 			//ss IE was returning a GIANT value for stdDeviation
-            var stdDev = this.attribute('stdDeviation').numValue();
-            if (stdDev > 1000) {
-                stdDev =
+			var stdDev = this.attribute('stdDeviation').numValue();
+			if (stdDev > 1000) {
+				stdDev =
 					//ss IE was mangling name from stdDeviation2 to stddeviation2
-                    this.attribute('stddeviation2').value !== ''
-                        ? this.attribute('stddeviation2').numValue()
-                        : 2;  //TODO provide default value as an option
-            }
-            
+					this.attribute('stddeviation2').value !== ''
+						? this.attribute('stddeviation2').numValue()
+						: 2;  //TODO provide default value as an option
+			}
+
 			this.blurRadius = Math.floor(stdDev);
-            //ss end
+			//ss end
 			this.extraFilterDistance = this.blurRadius;
 
-			this.apply = function(ctx, x, y, width, height) {
+			this.apply = function (ctx, x, y, width, height) {
 				//ss IE was not finding stackBlur using v1.4
-                if (stackBlur === undefined && window.StackBlur !== undefined){
-                    stackBlur = window.StackBlur;
-                }
-                //ss end
+				if (stackBlur === undefined && window.StackBlur !== undefined) {
+					stackBlur = window.StackBlur;
+				}
+				//ss end
 				if (typeof stackBlur.canvasRGBA == 'undefined') {
 					svg.log('ERROR: StackBlur.js must be included for blur to work');
 					return;
@@ -3168,20 +3170,20 @@ var path = require('path');
 		svg.Element.feGaussianBlur.prototype = new svg.Element.ElementBase;
 
 		// title element, do nothing
-		svg.Element.title = function(node) {}
+		svg.Element.title = function (node) { }
 		svg.Element.title.prototype = new svg.Element.ElementBase;
 
 		// desc element, do nothing
-		svg.Element.desc = function(node) {}
+		svg.Element.desc = function (node) { }
 		svg.Element.desc.prototype = new svg.Element.ElementBase;
 
-		svg.Element.MISSING = function(node) {
+		svg.Element.MISSING = function (node) {
 			svg.log('ERROR: Element \'' + node.nodeName + '\' not yet implemented.');
 		}
 		svg.Element.MISSING.prototype = new svg.Element.ElementBase;
 
 		// element factory
-		svg.CreateElement = function(node) {
+		svg.CreateElement = function (node) {
 			var className = node.nodeName.replace(/^[^:]+:/, ''); // remove namespace
 			className = className.replace(/\-/g, ''); // remove dashes
 			var e = null;
@@ -3196,19 +3198,19 @@ var path = require('path');
 		}
 
 		// load from url
-		svg.load = function(ctx, url) {
+		svg.load = function (ctx, url) {
 			svg.loadXml(ctx, svg.ajax(url));
 		}
 
 		// load from xml
-		svg.loadXml = function(ctx, xml) {
+		svg.loadXml = function (ctx, xml) {
 			svg.loadXmlDoc(ctx, svg.parseXml(xml));
 		}
 
-		svg.loadXmlDoc = function(ctx, dom) {
+		svg.loadXmlDoc = function (ctx, dom) {
 			svg.init(ctx);
 
-			var mapXY = function(p) {
+			var mapXY = function (p) {
 				var e = ctx.canvas;
 				while (e) {
 					p.x -= e.offsetLeft;
@@ -3222,12 +3224,12 @@ var path = require('path');
 
 			// bind mouse
 			if (svg.opts['ignoreMouse'] != true) {
-				ctx.canvas.onclick = function(e) {
+				ctx.canvas.onclick = function (e) {
 					var p = mapXY(new svg.Point(e != null ? e.clientX : event.clientX, e !=
 						null ? e.clientY : event.clientY));
 					svg.Mouse.onclick(p.x, p.y);
 				};
-				ctx.canvas.onmousemove = function(e) {
+				ctx.canvas.onmousemove = function (e) {
 					var p = mapXY(new svg.Point(e != null ? e.clientX : event.clientX, e !=
 						null ? e.clientY : event.clientY));
 					svg.Mouse.onmousemove(p.x, p.y);
@@ -3240,7 +3242,7 @@ var path = require('path');
 
 			// render loop
 			var isFirstRender = true;
-			var draw = function() {
+			var draw = function () {
 				svg.ViewPort.Clear();
 				//ss We do not know if this needs to be commented out
 				//if (ctx.canvas.parentNode) svg.ViewPort.SetCurrent(ctx.canvas.parentNode.clientWidth, ctx.canvas.parentNode.clientHeight);
@@ -3267,7 +3269,7 @@ var path = require('path');
 					try {
 						cWidth = ctx._canvas.width;
 						cHeight = ctx._canvas.height;
-					} catch (e) {}
+					} catch (e) { }
 				}
 				if (!cWidth || !cHeight) {
 					console.warn('Canvas width and/or height not set.  Defaults used.');
@@ -3276,16 +3278,16 @@ var path = require('path');
 				}
 				//ss end
 
-                //ss
-                if (svg.opts['ignoreDimensions'] == true && e.style('width').hasValue() && e.style('height').hasValue()) {
-                    try {
-                        cWidth = e.style('width').toPixels('x');
-                        cHeight = e.style('height').toPixels('y');
-                    } catch (e) {
-                        // This will always fail with jsPDF, as no viewport is set
-                    }
-                }
-                //ss end
+				//ss
+				if (svg.opts['ignoreDimensions'] == true && e.style('width').hasValue() && e.style('height').hasValue()) {
+					try {
+						cWidth = e.style('width').toPixels('x');
+						cHeight = e.style('height').toPixels('y');
+					} catch (e) {
+						// This will always fail with jsPDF, as no viewport is set
+					}
+				}
+				//ss end
 				svg.ViewPort.SetCurrent(cWidth, cHeight);
 
 				if (svg.opts['offsetX'] != null) e.attribute('x', true).value = svg.opts[
@@ -3341,7 +3343,7 @@ var path = require('path');
 				waitingForImages = false;
 				draw();
 			}
-			svg.intervalID = setInterval(function() {
+			svg.intervalID = setInterval(function () {
 				var needUpdate = false;
 
 				if (waitingForImages && svg.ImagesLoaded()) {
@@ -3374,35 +3376,35 @@ var path = require('path');
 			}, 1000 / svg.FRAMERATE);
 		}
 
-		svg.stop = function() {
+		svg.stop = function () {
 			if (svg.intervalID) {
 				clearInterval(svg.intervalID);
 			}
 		}
 
-		svg.Mouse = new(function() {
+		svg.Mouse = new (function () {
 			this.events = [];
-			this.hasEvents = function() {
+			this.hasEvents = function () {
 				return this.events.length != 0;
 			}
 
-			this.onclick = function(x, y) {
+			this.onclick = function (x, y) {
 				this.events.push({
 					type: 'onclick',
 					x: x,
 					y: y,
-					run: function(e) {
+					run: function (e) {
 						if (e.onclick) e.onclick();
 					}
 				});
 			}
 
-			this.onmousemove = function(x, y) {
+			this.onmousemove = function (x, y) {
 				this.events.push({
 					type: 'onmousemove',
 					x: x,
 					y: y,
-					run: function(e) {
+					run: function (e) {
 						if (e.onmousemove) e.onmousemove();
 					}
 				});
@@ -3410,7 +3412,7 @@ var path = require('path');
 
 			this.eventElements = [];
 
-			this.checkPath = function(element, ctx) {
+			this.checkPath = function (element, ctx) {
 				for (var i = 0; i < this.events.length; i++) {
 					var e = this.events[i];
 					if (ctx.isPointInPath && ctx.isPointInPath(e.x, e.y)) this.eventElements[
@@ -3418,14 +3420,14 @@ var path = require('path');
 				}
 			}
 
-			this.checkBoundingBox = function(element, bb) {
+			this.checkBoundingBox = function (element, bb) {
 				for (var i = 0; i < this.events.length; i++) {
 					var e = this.events[i];
 					if (bb.isPointInBox(e.x, e.y)) this.eventElements[i] = element;
 				}
 			}
 
-			this.runEvents = function() {
+			this.runEvents = function () {
 				svg.ctx.canvas.style.cursor = '';
 
 				for (var i = 0; i < this.events.length; i++) {
@@ -3447,7 +3449,7 @@ var path = require('path');
 	};
 
 	if (typeof CanvasRenderingContext2D != 'undefined') {
-		CanvasRenderingContext2D.prototype.drawSvg = function(s, dx, dy, dw, dh,
+		CanvasRenderingContext2D.prototype.drawSvg = function (s, dx, dy, dw, dh,
 			opts) {
 			var cOpts = {
 				ignoreMouse: true,

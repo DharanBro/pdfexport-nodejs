@@ -383,8 +383,8 @@ var finalPdf = function () {
                     case 'image':
 
                         let imgData = pdfContent[eachPage].data;
-                        let scaleWidthImage = pageDimensions[pdf_prop.orientation][pdf_prop.format]['width'] - (2 * parseInt(pdf_prop.left_margin, 10));
-                        pdfDoc.addImage(imgData, 'PNG', parseInt(pdf_prop.left_margin, 10), startPosY, scaleWidthImage, 0);
+                        let scaleWidthImage = pageDimensions[pdf_prop.orientation][pdf_prop.format]['width'] - (2 * parseInt(pdf_prop.leftMargin, 10));
+                        pdfDoc.addImage(imgData, 'PNG', parseInt(pdf_prop.leftMargin, 10), startPosY, scaleWidthImage, 0);
 
                         pdfDoc.addPage();
                         pageNumber++;
@@ -395,13 +395,13 @@ var finalPdf = function () {
 
                         let svgData = pdfContent[eachPage].data;
                         //console.log(startPosY+50);
-                        let scaleWidth = pageDimensions[pdf_prop.orientation][pdf_prop.format]['width'] - (2 * parseInt(pdf_prop.left_margin, 10));
+                        let scaleWidth = pageDimensions[pdf_prop.orientation][pdf_prop.format]['width'] - (2 * parseInt(pdf_prop.leftMargin, 10));
                         canvg(c, svgData, {
                             ignoreMouse: true,
                             ignoreAnimation: true,
                             ignoreDimensions: true,
                             scaleWidth: scaleWidth,
-                            offsetX: parseInt(pdf_prop.left_margin, 10),
+                            offsetX: parseInt(pdf_prop.leftMargin, 10),
                             offsetY: startPosY
 
                         });
@@ -475,10 +475,10 @@ var addHeaderFooter = function (doc, pageNo, pdf_prop, header_content, footer_co
 
         var imagePosObj = getStartPosition(pdf_prop,
             false,
-            header_content.image_align,
+            header_content.imageAlign,
             imageWidth,
             imageHeight);
-        imagePosObj.y = 0 + parseInt(pdf_prop.top_margin);
+        imagePosObj.y = 0 + parseInt(pdf_prop.topMargin);
         doc.addImage(header_content.image, 'PNG', imagePosObj.x, imagePosObj.y, 0, 0);
 
         retY = imagePosObj.y;
@@ -486,13 +486,13 @@ var addHeaderFooter = function (doc, pageNo, pdf_prop, header_content, footer_co
 
     //Header text
     if (header_content.text !== "") {
-        doc.setFontSize(header_content.text_size);
+        doc.setFontSize(header_content.textSize);
         var textPosObj = getStartPosition(pdf_prop,
             false,
-            header_content.text_align,
+            header_content.textAlign,
             header_content.text,
-            header_content.text_size);
-        if (header_content.image_align === header_content.text_align & header_content.image !== "") {
+            header_content.textSize);
+        if (header_content.imageAlign === header_content.textAlign & header_content.image !== "") {
 
             textPosObj.y = imagePosObj.y + imageHeight;
         }
@@ -502,19 +502,19 @@ var addHeaderFooter = function (doc, pageNo, pdf_prop, header_content, footer_co
     }
 
     //Header date
-    if (header_content.add_date === "true") {
+    if (header_content.addDate === "true") {
         var date = new Date()
             .toDateString();
-        doc.setFontSize(header_content.date_size);
+        doc.setFontSize(header_content.dateSize);
         var datePosObj = getStartPosition(pdf_prop,
             false,
-            header_content.date_align,
+            header_content.dateAlign,
             date,
-            header_content.date_size);
-        if (header_content.date_align === header_content.text_align && header_content.text !== "") {
-            datePosObj.y = textPosObj.y + parseInt(header_content.text_size);
+            header_content.dateSize);
+        if (header_content.dateAlign === header_content.textAlign && header_content.text !== "") {
+            datePosObj.y = textPosObj.y + parseInt(header_content.textSize);
 
-        } else if (header_content.date_align === header_content.image_align && header_content.image !== "") {
+        } else if (header_content.dateAlign === header_content.imageAlign && header_content.image !== "") {
             datePosObj.y = imagePosObj.y + imageHeight;
         }
         doc.text(datePosObj.x, datePosObj.y, date);
@@ -524,22 +524,22 @@ var addHeaderFooter = function (doc, pageNo, pdf_prop, header_content, footer_co
     }
 
     //Header page no
-    if (header_content.add_page_no === "true") {
+    if (header_content.addPageNo === "true") {
 
-        doc.setFontSize(header_content.page_no_size);
+        doc.setFontSize(header_content.pageNoSize);
         var pageNoPosObj = getStartPosition(pdf_prop,
             false,
-            header_content.page_no_align,
+            header_content.pageNoAlign,
             pageNo,
-            header_content.page_no_size);
+            header_content.pageNoSize);
 
-        if (header_content.page_no_align === header_content.date_align && header_content.add_date === "true") {
-            pageNoPosObj.y = datePosObj.y + parseInt(header_content.date_size);
+        if (header_content.pageNoAlign === header_content.dateAlign && header_content.addDate === "true") {
+            pageNoPosObj.y = datePosObj.y + parseInt(header_content.dateSize);
 
-        } else if (header_content.page_no_align === header_content.text_align && header_content.text !== "") {
-            pageNoPosObj.y = textPosObj.y + parseInt(header_content.text_size);
+        } else if (header_content.pageNoAlign === header_content.textAlign && header_content.text !== "") {
+            pageNoPosObj.y = textPosObj.y + parseInt(header_content.textSize);
         }
-        else if (header_content.page_no_align === header_content.image_align && header_content.image !== "") {
+        else if (header_content.pageNoAlign === header_content.imageAlign && header_content.image !== "") {
             pageNoPosObj.y = imagePosObj.y + imageHeight;
         }
 
@@ -553,47 +553,47 @@ var addHeaderFooter = function (doc, pageNo, pdf_prop, header_content, footer_co
     ***********************************/
 
     //Footer page no
-    if (footer_content.add_page_no === "true") {
+    if (footer_content.addPageNo === "true") {
 
-        doc.setFontSize(footer_content.page_no_size);
+        doc.setFontSize(footer_content.pageNoSize);
         var footerPagePosObj = getStartPosition(pdf_prop,
             true,
-            footer_content.page_no_align,
+            footer_content.pageNoAlign,
             pageNo,
-            footer_content.page_no_size);
+            footer_content.pageNoSize);
 
         doc.text(footerPagePosObj.x, footerPagePosObj.y, pageNo);
     }
 
     //Footer date
-    if (footer_content.add_date === "true") {
+    if (footer_content.addDate === "true") {
         var date = new Date()
             .toDateString();
-        doc.setFontSize(footer_content.date_size);
+        doc.setFontSize(footer_content.dateSize);
         var footerDatePosObj = getStartPosition(pdf_prop,
             true,
-            footer_content.date_align,
+            footer_content.dateAlign,
             date,
-            footer_content.date_size);
-        if (footer_content.date_align === footer_content.page_no_align) {
-            footerDatePosObj.y = footerPagePosObj.y - footer_content.date_size - 5;
+            footer_content.dateSize);
+        if (footer_content.dateAlign === footer_content.pageNoAlign) {
+            footerDatePosObj.y = footerPagePosObj.y - footer_content.dateSize - 5;
         }
         doc.text(footerDatePosObj.x, footerDatePosObj.y, date);
     }
 
     //Footer text
     if (footer_content.text !== "") {
-        doc.setFontSize(footer_content.text_size);
+        doc.setFontSize(footer_content.textSize);
         var footerTextPosObj = getStartPosition(pdf_prop,
             true, // Footer content
-            footer_content.text_align,
+            footer_content.textAlign,
             footer_content.text,
-            footer_content.text_size);
+            footer_content.textSize);
 
-        if (footer_content.text_align === footer_content.date_align) {
-            footerTextPosObj.y = footerDatePosObj.y - footer_content.text_size - 5;
-        } else if (footer_content.text_align === footer_content.page_no_align) {
-            footerTextPosObj.y = footerPagePosObj.y - footer_content.text_size - 5;
+        if (footer_content.textAlign === footer_content.dateAlign) {
+            footerTextPosObj.y = footerDatePosObj.y - footer_content.textSize - 5;
+        } else if (footer_content.textAlign === footer_content.pageNoAlign) {
+            footerTextPosObj.y = footerPagePosObj.y - footer_content.textSize - 5;
         }
 
         doc.text(footerTextPosObj.x, footerTextPosObj.y, footer_content.text);
@@ -604,16 +604,16 @@ var addHeaderFooter = function (doc, pageNo, pdf_prop, header_content, footer_co
 
         var footerImgPosObj = getStartPosition(pdf_prop,
             true,
-            footer_content.image_align,
+            footer_content.imageAlign,
             imageWidth,
             imageHeight);
 
-        imagePosObj.y = pageDimensions[pdf_prop.orientation][pdf_prop.format]['height'] - (parseInt(pdf_prop.top_margin) + imageHeight);
-        if (footer_content.image_align === footer_content.text_align) {
+        imagePosObj.y = pageDimensions[pdf_prop.orientation][pdf_prop.format]['height'] - (parseInt(pdf_prop.topMargin) + imageHeight);
+        if (footer_content.imageAlign === footer_content.textAlign) {
             footerImgPosObj.y = footerTextPosObj.y - imageHeight - 5;
-        } else if (footer_content.image_align === footer_content.date_align) {
+        } else if (footer_content.imageAlign === footer_content.dateAlign) {
             footerImgPosObj.y = footerDatePosObj.y - imageHeight - 5;
-        } else if (footer_content.image_align === footer_content.page_no_align) {
+        } else if (footer_content.image_align === footer_content.pageNoAlign) {
             footerImgPosObj.y = footerPagePosObj - imageHeight - 5;
         }
         doc.addImage(header_content.image, 'PNG', footerImgPosObj.x, footerImgPosObj.y, 0, 0);
@@ -626,8 +626,8 @@ var addHeaderFooter = function (doc, pageNo, pdf_prop, header_content, footer_co
 var getStartPosition = function (pdf_prop, isFooter, alignment, content, fontSize, entireSpace) {
     let orientation = pdf_prop.orientation;
     let pageSize = pdf_prop.format;
-    let topmargin = parseInt(pdf_prop.top_margin);
-    let leftmargin = parseInt(pdf_prop.left_margin);
+    let topmargin = parseInt(pdf_prop.topMargin);
+    let leftmargin = parseInt(pdf_prop.leftMargin);
     var ps = pageDimensions[orientation][pageSize]['width'];
     //typeof content=="number"? console.log("Image", pageDimensions[orientation][pageSize]['height'] - topmargin - parseInt(fontSize)): console.log("not an image");
     //var unit = 72/25.4;
